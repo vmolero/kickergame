@@ -38,7 +38,7 @@ security:
                     # csrf_provider: form.csrf_provider
 
                 logout:       true
-                anonymous:    tru
+                anonymous:    true
 
     access_control:
         - { path: ^/player/, role: ROLE_USER }
