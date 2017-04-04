@@ -16,15 +16,6 @@ class User extends BaseUser
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
-    /**
-     * @ORM\Column(type="string", unique=true)
-     */
-    protected $name;
-    /**
-     * @ORM\ManyToOne(targetEntity="Role", cascade={"persist"})
-     * @ORM\JoinColumn(name="role", referencedColumnName="id")
-     */
-    protected $role;
 
     public function __construct()
     {

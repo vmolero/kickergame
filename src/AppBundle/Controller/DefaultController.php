@@ -22,4 +22,20 @@ class DefaultController extends Controller
         //    'base_dir' => realpath($this->container->getParameter('kernel.root_dir').'/..').DIRECTORY_SEPARATOR,
         //));
     }
+
+    /**
+     * @Route("/admin/login", name="adminLogin")
+     */
+    public function adminLoginAction(Request $request)
+    {
+        return new Response('Admin Login');
+    }
+
+    /**
+     * @Route("/player/login", name="playerLogin")
+     */
+    public function playerLoginAction(Request $request)
+    {
+        return new Response('PLayer Login');
+    }
 }

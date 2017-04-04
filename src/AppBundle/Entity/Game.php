@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="tvg_role")
+ * @ORM\Table(name="tvg_game")
  */
 class Game
 {
@@ -27,11 +27,11 @@ class Game
      */
     protected $visitor;
     /**
-     * @ORM\Column(type="integer, options={"default" : 0})
+     * @ORM\Column(name="score_local", type="integer", options={"default" : 0})
      */
     protected $scoreLocal;
     /**
-     * @ORM\Column(type="integer", options={"default" : 0})
+     * @ORM\Column(name="score_visitor", type="integer", options={"default" : 0})
      */
     protected $scoreVisitor;
     /**
