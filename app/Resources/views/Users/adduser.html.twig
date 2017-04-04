@@ -4,7 +4,7 @@
     <div id="wrapper">
         <div id="container">
             <h2>Add Topic</h2>
-            <form method="post" action="/users/add">
+            <form method="post" action="/kickergame/app_dev.php/admin/users/add">
                 <div class="form-group">
                     <p>
                         <label class="form-control" for="username">User name</label>
@@ -21,10 +21,15 @@
                         <input type="text" class="form-control" id="role" name="role" placeholder="Role" /></p>
                 </div>
                 <div class="form-group">
+                    <p>
+                        <label class="form-control" for="email">EMail</label>
+                        <input type="text" class="form-control" id="email" name="email" placeholder="Email" /></p>
+                </div>
+                <div class="form-group">
                     <p><button class="btn btn-default">Add</button></p>
                 </div>
             </form>
-            <p><a href="/rate/new" class="btn btn-link" role="button">Add user</a></p>
+            <!-- <p><a href="/rate/new" class="btn btn-link" role="button">Add user</a></p> -->
         </div>
     </div>
 {% endblock %}
