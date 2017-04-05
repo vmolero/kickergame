@@ -70,6 +70,12 @@ fos_user:
     db_driver: orm # other valid values are 'mongodb' and 'couchdb'
     firewall_name: main
     user_class: AppBundle\Entity\User
+    registration:
+        form:
+            type: AppBundle\Form\RegistrationType
+            name: tvg_user_registration
+            handler: app.form.handler.registration
     from_email:
         address: "%mailer_user%"
         sender_name: "%mailer_user%"
+

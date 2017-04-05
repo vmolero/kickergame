@@ -60,7 +60,7 @@
       </parameter>
       <parameter key="FOSUserBundle" type="collection">
         <parameter key="parent">null</parameter>
-        <parameter key="path">/home/vmolero/PhpstormProjects/kickergame/vendor/friendsofsymfony/user-bundle</parameter>
+        <parameter key="path">/home/vmolero/PhpstormProjects/kickergame/vendor/friendsofsymfony/user-bundle/FOS/UserBundle</parameter>
         <parameter key="namespace">FOS\UserBundle</parameter>
       </parameter>
       <parameter key="AppBundle" type="collection">
@@ -541,16 +541,18 @@
     <parameter key="sensio_framework_extra.converter.doctrine.class">Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\DoctrineParamConverter</parameter>
     <parameter key="sensio_framework_extra.converter.datetime.class">Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\DateTimeParamConverter</parameter>
     <parameter key="sensio_framework_extra.view.listener.class">Sensio\Bundle\FrameworkExtraBundle\EventListener\TemplateListener</parameter>
-    <parameter key="fos_user.backend_type_orm">true</parameter>
-    <parameter key="fos_user.security.interactive_login_listener.class">FOS\UserBundle\EventListener\LastLoginListener</parameter>
+    <parameter key="fos_user.validator.password.class">FOS\UserBundle\Validator\PasswordValidator</parameter>
+    <parameter key="fos_user.validator.unique.class">FOS\UserBundle\Validator\UniqueValidator</parameter>
+    <parameter key="fos_user.security.interactive_login_listener.class">FOS\UserBundle\Security\InteractiveLoginListener</parameter>
     <parameter key="fos_user.security.login_manager.class">FOS\UserBundle\Security\LoginManager</parameter>
-    <parameter key="fos_user.resetting.email.template">@FOSUser/Resetting/email.txt.twig</parameter>
-    <parameter key="fos_user.registration.confirmation.template">@FOSUser/Registration/email.txt.twig</parameter>
+    <parameter key="fos_user.resetting.email.template">FOSUserBundle:Resetting:email.txt.twig</parameter>
+    <parameter key="fos_user.registration.confirmation.template">FOSUserBundle:Registration:email.txt.twig</parameter>
     <parameter key="fos_user.storage">orm</parameter>
     <parameter key="fos_user.firewall_name">main</parameter>
     <parameter key="fos_user.model_manager_name">null</parameter>
     <parameter key="fos_user.model.user.class">AppBundle\Entity\User</parameter>
-    <parameter key="fos_user.profile.form.type">FOS\UserBundle\Form\Type\ProfileFormType</parameter>
+    <parameter key="fos_user.template.engine">twig</parameter>
+    <parameter key="fos_user.profile.form.type">fos_user_profile</parameter>
     <parameter key="fos_user.profile.form.name">fos_user_profile_form</parameter>
     <parameter key="fos_user.profile.form.validation_groups" type="collection">
       <parameter>Profile</parameter>
@@ -560,13 +562,13 @@
       <parameter key="vmolero">vmolero</parameter>
     </parameter>
     <parameter key="fos_user.registration.confirmation.enabled">false</parameter>
-    <parameter key="fos_user.registration.form.type">FOS\UserBundle\Form\Type\RegistrationFormType</parameter>
-    <parameter key="fos_user.registration.form.name">fos_user_registration_form</parameter>
+    <parameter key="fos_user.registration.form.type">AppBundle\Form\RegistrationType</parameter>
+    <parameter key="fos_user.registration.form.name">tvg_user_registration</parameter>
     <parameter key="fos_user.registration.form.validation_groups" type="collection">
       <parameter>Registration</parameter>
       <parameter>Default</parameter>
     </parameter>
-    <parameter key="fos_user.change_password.form.type">FOS\UserBundle\Form\Type\ChangePasswordFormType</parameter>
+    <parameter key="fos_user.change_password.form.type">fos_user_change_password</parameter>
     <parameter key="fos_user.change_password.form.name">fos_user_change_password_form</parameter>
     <parameter key="fos_user.change_password.form.validation_groups" type="collection">
       <parameter>ChangePassword</parameter>
@@ -575,9 +577,8 @@
     <parameter key="fos_user.resetting.email.from_email" type="collection">
       <parameter key="vmolero">vmolero</parameter>
     </parameter>
-    <parameter key="fos_user.resetting.retry_ttl">7200</parameter>
     <parameter key="fos_user.resetting.token_ttl">86400</parameter>
-    <parameter key="fos_user.resetting.form.type">FOS\UserBundle\Form\Type\ResettingFormType</parameter>
+    <parameter key="fos_user.resetting.form.type">fos_user_resetting</parameter>
     <parameter key="fos_user.resetting.form.name">fos_user_resetting_form</parameter>
     <parameter key="fos_user.resetting.form.validation_groups" type="collection">
       <parameter>ResetPassword</parameter>
@@ -663,6 +664,9 @@
     </parameter>
   </parameters>
   <services>
+    <service id="app.form.registration" class="AppBundle\Form\RegistrationType">
+      <tag name="form.type" alias="tvg_user_registration"/>
+    </service>
     <service id="controller_name_converter" class="Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser" public="false">
       <tag name="monolog.logger" channel="request"/>
       <argument type="service" id="kernel"/>
@@ -1128,6 +1132,8 @@
           <service class="Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension" public="false">
             <argument type="service" id="service_container"/>
             <argument type="collection">
+              <argument key="tvg_user_registration">app.form.registration</argument>
+              <argument key="AppBundle\Form\RegistrationType">app.form.registration</argument>
               <argument key="form">form.type.form</argument>
               <argument key="Symfony\Component\Form\Extension\Core\Type\FormType">form.type.form</argument>
               <argument key="birthday">form.type.birthday</argument>
@@ -1451,7 +1457,7 @@
       <call method="addXmlMappings">
         <argument type="collection">
           <argument>/home/vmolero/PhpstormProjects/kickergame/vendor/symfony/symfony/src/Symfony/Component/Form/Resources/config/validation.xml</argument>
-          <argument>/home/vmolero/PhpstormProjects/kickergame/vendor/friendsofsymfony/user-bundle/Resources/config/validation.xml</argument>
+          <argument>/home/vmolero/PhpstormProjects/kickergame/vendor/friendsofsymfony/user-bundle/FOS/UserBundle/Resources/config/validation.xml</argument>
         </argument>
       </call>
       <call method="enableAnnotationMapping">
@@ -1466,13 +1472,13 @@
           <argument type="service">
             <service class="FOS\UserBundle\Validator\Initializer" public="false">
               <tag name="validator.initializer"/>
-              <argument type="service" id="fos_user.util.canonical_fields_updater"/>
+              <argument type="service" id="fos_user.user_manager"/>
             </service>
           </argument>
         </argument>
       </call>
       <call method="addXmlMapping">
-        <argument>/home/vmolero/PhpstormProjects/kickergame/vendor/friendsofsymfony/user-bundle/DependencyInjection/Compiler/../../Resources/config/storage-validation/orm.xml</argument>
+        <argument>/home/vmolero/PhpstormProjects/kickergame/vendor/friendsofsymfony/user-bundle/FOS/UserBundle/DependencyInjection/Compiler/../../Resources/config/storage-validation/orm.xml</argument>
       </call>
       <factory class="Symfony\Component\Validator\Validation" method="createValidatorBuilder"/>
     </service>
@@ -1760,6 +1766,14 @@
         </argument>
         <argument>0</argument>
       </call>
+      <call method="addListenerService">
+        <argument>security.interactive_login</argument>
+        <argument type="collection">
+          <argument>fos_user.security.interactive_login_listener</argument>
+          <argument>onSecurityInteractiveLogin</argument>
+        </argument>
+        <argument>0</argument>
+      </call>
       <call method="addSubscriberService">
         <argument>response_listener</argument>
         <argument>Symfony\Component\HttpKernel\EventListener\ResponseListener</argument>
@@ -1849,22 +1863,6 @@
         <argument>Sensio\Bundle\FrameworkExtraBundle\EventListener\SecurityListener</argument>
       </call>
       <call method="addSubscriberService">
-        <argument>fos_user.security.interactive_login_listener</argument>
-        <argument>FOS\UserBundle\EventListener\LastLoginListener</argument>
-      </call>
-      <call method="addSubscriberService">
-        <argument>fos_user.listener.authentication</argument>
-        <argument>FOS\UserBundle\EventListener\AuthenticationListener</argument>
-      </call>
-      <call method="addSubscriberService">
-        <argument>fos_user.listener.flash</argument>
-        <argument>FOS\UserBundle\EventListener\FlashListener</argument>
-      </call>
-      <call method="addSubscriberService">
-        <argument>fos_user.listener.resetting</argument>
-        <argument>FOS\UserBundle\EventListener\ResettingListener</argument>
-      </call>
-      <call method="addSubscriberService">
         <argument>debug.dump_listener</argument>
         <argument>Symfony\Component\HttpKernel\EventListener\DumpListener</argument>
       </call>
@@ -1909,7 +1907,7 @@
         </argument>
         <argument type="service">
           <service class="Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider" public="false">
-            <argument>58e36666b59c87.01469029</argument>
+            <argument>58e4eccfc5f420.39286017</argument>
           </service>
         </argument>
       </argument>
@@ -2028,7 +2026,7 @@
                 <call method="add">
                   <argument type="service">
                     <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
-                      <argument>^/$</argument>
+                      <argument>^/login$</argument>
                     </service>
                   </argument>
                   <argument type="collection">
@@ -2039,7 +2037,7 @@
                 <call method="add">
                   <argument type="service">
                     <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
-                      <argument>^/logout$</argument>
+                      <argument>^/register</argument>
                     </service>
                   </argument>
                   <argument type="collection">
@@ -2050,7 +2048,18 @@
                 <call method="add">
                   <argument type="service">
                     <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
-                      <argument>^/player/login$</argument>
+                      <argument>^/resetting</argument>
+                    </service>
+                  </argument>
+                  <argument type="collection">
+                    <argument>IS_AUTHENTICATED_ANONYMOUSLY</argument>
+                  </argument>
+                  <argument>null</argument>
+                </call>
+                <call method="add">
+                  <argument type="service">
+                    <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
+                      <argument>^/player</argument>
                     </service>
                   </argument>
                   <argument type="collection">
@@ -2061,7 +2070,7 @@
                 <call method="add">
                   <argument type="service">
                     <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
-                      <argument>^/admin/login$</argument>
+                      <argument>^/admin</argument>
                     </service>
                   </argument>
                   <argument type="collection">
@@ -2198,7 +2207,7 @@
         <argument type="service">
           <service class="Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener" public="false">
             <argument type="service" id="security.token_storage"/>
-            <argument>58e36666b59c87.01469029</argument>
+            <argument>58e4eccfc5f420.39286017</argument>
             <argument type="service" id="monolog.logger.security" on-invalid="null"/>
             <argument type="service" id="security.authentication.manager"/>
           </service>
@@ -2213,7 +2222,7 @@
                 <call method="add">
                   <argument type="service">
                     <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
-                      <argument>^/$</argument>
+                      <argument>^/login$</argument>
                     </service>
                   </argument>
                   <argument type="collection">
@@ -2224,7 +2233,7 @@
                 <call method="add">
                   <argument type="service">
                     <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
-                      <argument>^/logout$</argument>
+                      <argument>^/register</argument>
                     </service>
                   </argument>
                   <argument type="collection">
@@ -2235,7 +2244,18 @@
                 <call method="add">
                   <argument type="service">
                     <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
-                      <argument>^/player/login$</argument>
+                      <argument>^/resetting</argument>
+                    </service>
+                  </argument>
+                  <argument type="collection">
+                    <argument>IS_AUTHENTICATED_ANONYMOUSLY</argument>
+                  </argument>
+                  <argument>null</argument>
+                </call>
+                <call method="add">
+                  <argument type="service">
+                    <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
+                      <argument>^/player</argument>
                     </service>
                   </argument>
                   <argument type="collection">
@@ -2246,7 +2266,7 @@
                 <call method="add">
                   <argument type="service">
                     <service class="Symfony\Component\HttpFoundation\RequestMatcher" public="false">
-                      <argument>^/admin/login$</argument>
+                      <argument>^/admin</argument>
                     </service>
                   </argument>
                   <argument type="collection">
@@ -2616,10 +2636,9 @@
           <argument type="service" id="service_container"/>
           <call method="addEventSubscriber">
             <argument type="service">
-              <service class="FOS\UserBundle\Doctrine\UserListener" public="false">
+              <service class="FOS\UserBundle\Entity\UserListener" public="false">
                 <tag name="doctrine.event_subscriber"/>
-                <argument type="service" id="fos_user.util.password_updater"/>
-                <argument type="service" id="fos_user.util.canonical_fields_updater"/>
+                <argument type="service" id="service_container"/>
               </service>
             </argument>
           </call>
@@ -2681,6 +2700,7 @@
         <service class="Doctrine\ORM\Configuration" public="false">
           <call method="setEntityNamespaces">
             <argument type="collection">
+              <argument key="FOSUserBundle">FOS\UserBundle\Entity</argument>
               <argument key="AppBundle">AppBundle\Entity</argument>
             </argument>
           </call>
@@ -2698,6 +2718,19 @@
               <service class="Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain" public="false">
                 <call method="addDriver">
                   <argument type="service">
+                    <service class="Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver" public="false">
+                      <argument type="collection">
+                        <argument key="/home/vmolero/PhpstormProjects/kickergame/vendor/friendsofsymfony/user-bundle/FOS/UserBundle/Resources/config/doctrine">FOS\UserBundle\Entity</argument>
+                      </argument>
+                      <call method="setGlobalBasename">
+                        <argument>mapping</argument>
+                      </call>
+                    </service>
+                  </argument>
+                  <argument>FOS\UserBundle\Entity</argument>
+                </call>
+                <call method="addDriver">
+                  <argument type="service">
                     <service class="Doctrine\ORM\Mapping\Driver\AnnotationDriver" public="false">
                       <argument type="service" id="annotation_reader"/>
                       <argument type="collection">
@@ -2706,21 +2739,6 @@
                     </service>
                   </argument>
                   <argument>AppBundle\Entity</argument>
-                </call>
-                <call method="addDriver">
-                  <argument type="service">
-                    <service class="Doctrine\ORM\Mapping\Driver\XmlDriver">
-                      <argument type="service">
-                        <service class="Doctrine\Common\Persistence\Mapping\Driver\SymfonyFileLocator">
-                          <argument type="collection">
-                            <argument key="/home/vmolero/PhpstormProjects/kickergame/vendor/friendsofsymfony/user-bundle/Resources/config/doctrine-mapping">FOS\UserBundle\Model</argument>
-                          </argument>
-                          <argument>.orm.xml</argument>
-                        </service>
-                      </argument>
-                    </service>
-                  </argument>
-                  <argument>FOS\UserBundle\Model</argument>
                 </call>
               </service>
             </argument>
@@ -2816,41 +2834,21 @@
       <argument type="service" id="security.token_storage" on-invalid="null"/>
       <argument type="service" id="security.authorization_checker" on-invalid="null"/>
     </service>
-    <service id="fos_user.security.interactive_login_listener" class="FOS\UserBundle\EventListener\LastLoginListener">
-      <tag name="kernel.event_subscriber"/>
+    <service id="fos_user.security.interactive_login_listener" class="FOS\UserBundle\Security\InteractiveLoginListener">
+      <tag name="kernel.event_listener" event="security.interactive_login" method="onSecurityInteractiveLogin"/>
       <argument type="service" id="fos_user.user_manager"/>
     </service>
     <service id="fos_user.security.login_manager" class="FOS\UserBundle\Security\LoginManager">
-      <argument type="service" id="security.token_storage"/>
+      <argument type="service" id="security.context"/>
       <argument type="service" id="security.user_checker.main"/>
       <argument type="service" id="security.authentication.session_strategy"/>
-      <argument type="service" id="request_stack"/>
-      <argument>null</argument>
+      <argument type="service" id="service_container"/>
     </service>
     <service id="fos_user.user_provider.username" class="FOS\UserBundle\Security\UserProvider" public="false">
       <argument type="service" id="fos_user.user_manager"/>
     </service>
     <service id="fos_user.util.user_manipulator" class="FOS\UserBundle\Util\UserManipulator">
       <argument type="service" id="fos_user.user_manager"/>
-      <argument type="service" id="debug.event_dispatcher"/>
-      <argument type="service" id="request_stack"/>
-    </service>
-    <service id="fos_user.util.password_updater" class="FOS\UserBundle\Util\PasswordUpdater" public="false">
-      <argument type="service" id="security.encoder_factory"/>
-    </service>
-    <service id="fos_user.util.canonical_fields_updater" class="FOS\UserBundle\Util\CanonicalFieldsUpdater" public="false">
-      <argument type="service" id="fos_user.util.email_canonicalizer"/>
-      <argument type="service" id="fos_user.util.email_canonicalizer"/>
-    </service>
-    <service id="fos_user.listener.authentication" class="FOS\UserBundle\EventListener\AuthenticationListener">
-      <tag name="kernel.event_subscriber"/>
-      <argument type="service" id="fos_user.security.login_manager"/>
-      <argument>main</argument>
-    </service>
-    <service id="fos_user.listener.flash" class="FOS\UserBundle\EventListener\FlashListener">
-      <tag name="kernel.event_subscriber"/>
-      <argument type="service" id="session"/>
-      <argument type="service" id="translator"/>
     </service>
     <service id="fos_user.username_form_type" class="FOS\UserBundle\Form\Type\UsernameFormType">
       <tag name="form.type" alias="fos_user_username"/>
@@ -2860,62 +2858,68 @@
         </service>
       </argument>
     </service>
-    <service id="fos_user.profile.form.factory" class="FOS\UserBundle\Form\Factory\FormFactory">
-      <argument type="service" id="form.factory"/>
+    <service id="fos_user.profile.form" class="Symfony\Component\Form\Form" factory-method="createNamed" factory-service="form.factory">
       <argument>fos_user_profile_form</argument>
-      <argument>FOS\UserBundle\Form\Type\ProfileFormType</argument>
+      <argument>fos_user_profile</argument>
+      <argument>null</argument>
       <argument type="collection">
-        <argument>Profile</argument>
-        <argument>Default</argument>
+        <argument key="validation_groups" type="collection">
+          <argument>Profile</argument>
+          <argument>Default</argument>
+        </argument>
       </argument>
     </service>
     <service id="fos_user.profile.form.type" class="FOS\UserBundle\Form\Type\ProfileFormType">
       <tag name="form.type" alias="fos_user_profile"/>
       <argument>AppBundle\Entity\User</argument>
     </service>
-    <service id="fos_user.registration.form.factory" class="FOS\UserBundle\Form\Factory\FormFactory">
-      <argument type="service" id="form.factory"/>
-      <argument>fos_user_registration_form</argument>
-      <argument>FOS\UserBundle\Form\Type\RegistrationFormType</argument>
+    <service id="fos_user.registration.form" class="Symfony\Component\Form\Form" factory-method="createNamed" factory-service="form.factory">
+      <argument>tvg_user_registration</argument>
+      <argument>AppBundle\Form\RegistrationType</argument>
+      <argument>null</argument>
       <argument type="collection">
-        <argument>Registration</argument>
-        <argument>Default</argument>
+        <argument key="validation_groups" type="collection">
+          <argument>Registration</argument>
+          <argument>Default</argument>
+        </argument>
       </argument>
     </service>
     <service id="fos_user.registration.form.type" class="FOS\UserBundle\Form\Type\RegistrationFormType">
       <tag name="form.type" alias="fos_user_registration"/>
       <argument>AppBundle\Entity\User</argument>
     </service>
-    <service id="fos_user.change_password.form.factory" class="FOS\UserBundle\Form\Factory\FormFactory">
-      <argument type="service" id="form.factory"/>
+    <service id="fos_user.change_password.form" class="Symfony\Component\Form\Form" factory-method="createNamed" factory-service="form.factory">
       <argument>fos_user_change_password_form</argument>
-      <argument>FOS\UserBundle\Form\Type\ChangePasswordFormType</argument>
+      <argument>fos_user_change_password</argument>
+      <argument>null</argument>
       <argument type="collection">
-        <argument>ChangePassword</argument>
-        <argument>Default</argument>
+        <argument key="validation_groups" type="collection">
+          <argument>ChangePassword</argument>
+          <argument>Default</argument>
+        </argument>
       </argument>
     </service>
     <service id="fos_user.change_password.form.type" class="FOS\UserBundle\Form\Type\ChangePasswordFormType">
       <tag name="form.type" alias="fos_user_change_password"/>
-      <argument>AppBundle\Entity\User</argument>
     </service>
-    <service id="fos_user.resetting.form.factory" class="FOS\UserBundle\Form\Factory\FormFactory">
-      <argument type="service" id="form.factory"/>
+    <service id="fos_user.change_password.form.handler.default" class="FOS\UserBundle\Form\Handler\ChangePasswordFormHandler" scope="request">
+      <argument type="service" id="fos_user.change_password.form"/>
+      <argument type="service" id="request"/>
+      <argument type="service" id="fos_user.user_manager"/>
+    </service>
+    <service id="fos_user.resetting.form" class="Symfony\Component\Form\Form" factory-method="createNamed" factory-service="form.factory">
       <argument>fos_user_resetting_form</argument>
-      <argument>FOS\UserBundle\Form\Type\ResettingFormType</argument>
+      <argument>fos_user_resetting</argument>
+      <argument>null</argument>
       <argument type="collection">
-        <argument>ResetPassword</argument>
-        <argument>Default</argument>
+        <argument key="validation_groups" type="collection">
+          <argument>ResetPassword</argument>
+          <argument>Default</argument>
+        </argument>
       </argument>
     </service>
     <service id="fos_user.resetting.form.type" class="FOS\UserBundle\Form\Type\ResettingFormType">
       <tag name="form.type" alias="fos_user_resetting"/>
-      <argument>AppBundle\Entity\User</argument>
-    </service>
-    <service id="fos_user.listener.resetting" class="FOS\UserBundle\EventListener\ResettingListener">
-      <tag name="kernel.event_subscriber"/>
-      <argument type="service" id="router"/>
-      <argument>86400</argument>
     </service>
     <service id="data_collector.dump" class="Symfony\Component\HttpKernel\DataCollector\DumpDataCollector">
       <tag name="data_collector" id="dump" template="@Debug/Profiler/dump.html.twig" priority="240"/>
@@ -3304,8 +3308,8 @@
       <argument type="service" id="router"/>
       <argument type="service" id="templating"/>
       <argument type="collection">
-        <argument key="confirmation.template">@FOSUser/Registration/email.txt.twig</argument>
-        <argument key="resetting.template">@FOSUser/Resetting/email.txt.twig</argument>
+        <argument key="confirmation.template">FOSUserBundle:Registration:email.txt.twig</argument>
+        <argument key="resetting.template">FOSUserBundle:Resetting:email.txt.twig</argument>
         <argument key="from_email" type="collection">
           <argument key="confirmation" type="collection">
             <argument key="vmolero">vmolero</argument>
@@ -3317,17 +3321,36 @@
       </argument>
     </service>
     <service id="fos_user.util.email_canonicalizer" class="FOS\UserBundle\Util\Canonicalizer"/>
-    <service id="fos_user.util.token_generator" class="FOS\UserBundle\Util\TokenGenerator"/>
+    <service id="fos_user.util.token_generator" class="FOS\UserBundle\Util\TokenGenerator">
+      <argument type="service" id="logger" on-invalid="ignore"/>
+    </service>
     <service id="fos_user.user_manager" class="FOS\UserBundle\Doctrine\UserManager">
-      <argument type="service" id="fos_user.util.password_updater"/>
-      <argument type="service" id="fos_user.util.canonical_fields_updater"/>
+      <argument type="service" id="security.encoder_factory"/>
+      <argument type="service" id="fos_user.util.email_canonicalizer"/>
+      <argument type="service" id="fos_user.util.email_canonicalizer"/>
       <argument type="service">
-        <service class="Doctrine\Common\Persistence\ObjectManager" public="false">
+        <service class="Doctrine\ORM\EntityManager" factory-method="getManager" factory-service="doctrine" public="false">
           <argument>null</argument>
-          <factory service="doctrine" method="getManager"/>
         </service>
       </argument>
       <argument>AppBundle\Entity\User</argument>
+    </service>
+    <service id="fos_user.profile.form.handler" class="FOS\UserBundle\Form\Handler\ProfileFormHandler" scope="request">
+      <argument type="service" id="fos_user.profile.form"/>
+      <argument type="service" id="request"/>
+      <argument type="service" id="fos_user.user_manager"/>
+    </service>
+    <service id="fos_user.registration.form.handler" class="AppBundle\Form\Handler\RegistrationFormHandler" scope="request">
+      <argument type="service" id="fos_user.registration.form"/>
+      <argument type="service" id="request"/>
+      <argument type="service" id="fos_user.user_manager"/>
+      <argument type="service" id="fos_user.mailer"/>
+      <argument type="service" id="fos_user.util.token_generator"/>
+    </service>
+    <service id="fos_user.resetting.form.handler" class="FOS\UserBundle\Form\Handler\ResettingFormHandler" scope="request">
+      <argument type="service" id="fos_user.resetting.form"/>
+      <argument type="service" id="request"/>
+      <argument type="service" id="fos_user.user_manager"/>
     </service>
     <service id="twig.loader" class="Symfony\Bundle\TwigBundle\Loader\FilesystemLoader">
       <tag name="twig.loader"/>
@@ -3354,7 +3377,11 @@
         <argument>Doctrine</argument>
       </call>
       <call method="addPath">
-        <argument>/home/vmolero/PhpstormProjects/kickergame/vendor/friendsofsymfony/user-bundle/Resources/views</argument>
+        <argument>/home/vmolero/PhpstormProjects/kickergame/app/Resources/FOSUserBundle/views</argument>
+        <argument>FOSUser</argument>
+      </call>
+      <call method="addPath">
+        <argument>/home/vmolero/PhpstormProjects/kickergame/vendor/friendsofsymfony/user-bundle/FOS/UserBundle/Resources/views</argument>
         <argument>FOSUser</argument>
       </call>
       <call method="addPath">
@@ -3390,6 +3417,7 @@
     <service id="doctrine.orm.default_result_cache" alias="doctrine_cache.providers.doctrine.orm.default_result_cache"/>
     <service id="doctrine.orm.default_query_cache" alias="doctrine_cache.providers.doctrine.orm.default_query_cache"/>
     <service id="fos_user.util.username_canonicalizer" alias="fos_user.util.email_canonicalizer"/>
+    <service id="fos_user.change_password.form.handler" alias="fos_user.change_password.form.handler.default"/>
     <service id="sensio.distribution.webconfigurator" alias="sensio_distribution.webconfigurator"/>
     <service id="console.command.sensiolabs_security_command_securitycheckercommand" alias="sensio_distribution.security_checker.command"/>
   </services>
