@@ -1,4 +1,5 @@
 <?php
+
 namespace AppBundle\Form;
 
 use AppBundle\Domain\Roles\RoleHolder;
@@ -11,28 +12,34 @@ class RegistrationType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('fullName', 'text', ['label' => 'Full name']);
-        $builder->add('roles', ChoiceType::class,
-                [
-                    'choices' => [Role::create('admin'),
-                                  Role::create('player')],
-                    'choices_as_values' => true,
-                    'choice_label' => function(RoleHolder $role, $key, $index) {
-                        return strtoupper($role->getName());
-                    },
-                    'choice_value' => function($value) {
-                        if ($value instanceof RoleHolder) {
-                            return $value->getCode();
-                        }
-                        return null;
-                    },
-                    'choice_attr' => function(RoleHolder $role, $key, $index) {
-                        return ['class' => 'role_'.strtolower($role->getName())];
-                    },
-                    'placeholder' => 'Choose your role',
-                    'expanded' => true,
-                    'multiple' => true,
-                ]);
+        $builder->add('fullName', 'text', ['label' => 'registration.fullname']);
+        $builder->add(
+            'roles',
+            ChoiceType::class,
+            [
+                'choices' => [
+                    Role::create('admin'),
+                    Role::create('player'),
+                ],
+                'choices_as_values' => true,
+                'choice_label' => function (RoleHolder $role, $key, $index) {
+                    return strtoupper($role->getName());
+                },
+                'choice_value' => function ($value) {
+                    if ($value instanceof RoleHolder) {
+                        return $value->getCode();
+                    }
+
+                    return null;
+                },
+                'choice_attr' => function (RoleHolder $role, $key, $index) {
+                    return ['class' => 'role_'.strtolower($role->getName())];
+                },
+                'placeholder' => 'Choose your role',
+                'expanded' => true,
+                'multiple' => true,
+            ]
+        );
     }
 
     public function getParent()

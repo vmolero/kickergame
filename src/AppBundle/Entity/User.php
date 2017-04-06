@@ -1,10 +1,12 @@
 <?php
+
 namespace AppBundle\Entity;
 
 use AppBundle\Domain\Roles\RoleHolder;
-use FOS\UserBundle\Entity\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
+use FOS\UserBundle\Entity\User as BaseUser;
 use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * @ORM\Entity
@@ -16,6 +18,7 @@ class User extends BaseUser
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
      */
     protected $id;
 
@@ -54,6 +57,7 @@ class User extends BaseUser
     public function setFullName($fullName)
     {
         $this->fullName = $fullName;
+
         return $this;
     }
 
@@ -62,6 +66,7 @@ class User extends BaseUser
         if ($role instanceof RoleHolder) {
             return parent::addRole($role->getCode());
         }
+
         return parent::addRole($role);
     }
 

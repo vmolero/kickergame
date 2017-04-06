@@ -18,6 +18,7 @@ class AdminRole extends Role
 
     public function getCode()
     {
-        return 'ROLE_ADMIN';
+        return 'ROLE_SUPER_'.
+            'ADMIN';
     }
 }

@@ -26,4 +26,13 @@ class Team
      * @ORM\JoinColumn(name="player2", referencedColumnName="id")
      */
     protected $player2;
+
+    /**
+     * Team constructor.
+     */
+    public function __construct()
+    {
+    }
+
+
 }
