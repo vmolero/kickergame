@@ -6,6 +6,9 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class DefaultControllerTest extends WebTestCase
 {
+    /**
+     * @codeCoverageIgnore
+     */
     public function testIndex()
     {
         $client = static::createClient();
