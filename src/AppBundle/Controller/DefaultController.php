@@ -2,13 +2,11 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class DefaultController extends Controller
 {
@@ -17,18 +15,35 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
-        // replace this example code with whatever you need
-        return $this->render('default/index.html.twig');
+        $this->get('security.authorization_checker')->isGranted('ROLE_PLAYER') && ($path = '/players');
+        $this->get('security.authorization_checker')->isGranted('ROLE_ADMIN') && ($path = '/admin');
+
+        return new RedirectResponse($request->getBaseUrl().$path);
     }
 
     /**
-     * @Security("has_role('ROLE_USER')")
+     * @Security("has_role('ROLE_PLAYER')")
      * @Route("/players/", name="showGames")
      */
-    public function showGamesAction(Request $request)
+    public function playerHomepageAction(Request $request)
     {
 
-        return new Response('Default response');
+        return $this->render('default/index.html.twig');
+
+        // replace this example code with whatever you need
+        // return $this->render('default/index.html.twig', array(
+        //    'base_dir' => realpath($this->container->getParameter('kernel.root_dir').'/..').DIRECTORY_SEPARATOR,
+        //));
+    }
+
+    /**
+     * @Security("has_role('ROLE_ADMIN')")
+     * @Route("/admin/", name="adminHomepage")
+     */
+    public function adminHomepageAction(Request $request)
+    {
+
+        return $this->render('default/index.html.twig');
 
         // replace this example code with whatever you need
         // return $this->render('default/index.html.twig', array(

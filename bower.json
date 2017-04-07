@@ -1,0 +1,21 @@
+{
+  "name": "kickergame",
+  "homepage": "http://git.trivago.trv/users/vmolero/repos/trial-kickergame/browse",
+  "authors": [
+    "Victor Molero <victor.molero@trivago.com>"
+  ],
+  "description": "Trivago Trial",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.1.1",
+    "bootstrap": "^3.3.7"
+  }
+}

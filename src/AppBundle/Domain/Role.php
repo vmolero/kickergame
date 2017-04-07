@@ -10,9 +10,8 @@ use AppBundle\Entity\Role as RoleModel;
 
 abstract class Role extends RoleModel implements RoleHolder
 {
-    const NULL = 0;
-    const ADMIN = 1;
-    const PLAYER = 2;
+    const ADMIN = 'ROLE_ADMIN';
+    const PLAYER = 'ROLE_PLAYER';
 
     public static function create($string)
     {
@@ -20,14 +19,11 @@ abstract class Role extends RoleModel implements RoleHolder
         switch ($string)
         {
             case self::ADMIN:
-            case 'ROLE_ADMIN':
             case 'admin':
                 $c = new AdminRole();
                 break;
             case self::PLAYER:
             case 'player':
-            case 'ROLE_USER':
-            default:
                 $c = new PlayerRole();
                 break;
         }
