@@ -19,6 +19,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user->addRole($role1);
         $user->addRole($role2);
         $roles = $user->getRoles();
-        $this->assertEquals(['ROLE_ADMIN', 'ROLE_USER'], $roles);
+        $this->assertEquals(['ROLE_ADMIN', 'ROLE_PLAYER'], $roles);
     }
 }

@@ -6,7 +6,7 @@ use AppBundle\Domain\Role;
 
 class AdminRole extends Role
 {
-    public function getRole()
+    public function getCode()
     {
         return self::ADMIN;
     }
@@ -14,11 +14,5 @@ class AdminRole extends Role
     public function getName()
     {
         return 'Administrator';
-    }
-
-    public function getCode()
-    {
-        return 'ROLE_SUPER_'.
-            'ADMIN';
     }
 }

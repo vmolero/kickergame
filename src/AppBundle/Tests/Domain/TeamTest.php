@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: vmolero
- * Date: 4/6/17
- * Time: 9:36 AM
- */
 
-namespace AppBundle\Test\Entity;
+namespace AppBundle\Test\Domain;
 
 use AppBundle\Domain\Team;
 use AppBundle\Domain\Users\Player;

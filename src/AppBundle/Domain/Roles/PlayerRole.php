@@ -6,10 +6,6 @@ use AppBundle\Domain\Role;
 
 class PlayerRole extends Role
 {
-    public function getRole()
-    {
-        return self::PLAYER;
-    }
 
     public function getName()
     {
@@ -18,6 +14,6 @@ class PlayerRole extends Role
 
     public function getCode()
     {
-        return 'ROLE_USER';
+        return self::PLAYER;
     }
 }

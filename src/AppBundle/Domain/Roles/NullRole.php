@@ -6,17 +6,12 @@ use AppBundle\Domain\Role;
 
 class NullRole extends Role
 {
-    public function getRole()
+    public function getCode()
     {
-        return self::NULL;
+        return null;
     }
 
     public function getName()
-    {
-        return '';
-    }
-
-    public function getCode()
     {
         return '';
     }

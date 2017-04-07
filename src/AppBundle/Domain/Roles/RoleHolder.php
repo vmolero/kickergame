@@ -11,7 +11,6 @@ namespace AppBundle\Domain\Roles;
 
 interface RoleHolder
 {
-    public function getRole();
     public function getName();
     public function getCode();
 }
