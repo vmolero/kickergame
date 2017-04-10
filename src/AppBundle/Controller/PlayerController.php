@@ -19,7 +19,8 @@ class AdminController extends Controller
     public function indexAction(Request $request)
     {
 
-        !$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') && $this->redirect($request->getBaseUrl().'/login');
+        !$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') &&
+            $this->redirect($request->getBaseUrl().'/login');
         return $this->render(
             'players/index.html.twig',
             [

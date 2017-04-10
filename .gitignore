@@ -13,3 +13,9 @@
 .idea
 bower_components
 web/assets/vendor
+bin
+app/logs
+app/cache
+bower_components
+vendor
+

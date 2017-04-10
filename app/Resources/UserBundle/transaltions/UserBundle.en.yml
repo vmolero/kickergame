@@ -44,7 +44,7 @@ change_password:
 registration:
     check_email: An email has been sent to %email%. It contains an activation link you must click to activate your account.
     confirmed: Congrats %username%, your account is now activated.
-    complete: User %username% is registered and active.
+    completed: User %username% is registered and active.
     back: Back to the originating page.
     submit: Register
     flash:

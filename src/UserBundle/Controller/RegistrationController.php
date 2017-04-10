@@ -44,6 +44,7 @@ class RegistrationController extends BaseController
             [
                 'form' => $form->createView(),
                 'username' => $username,
+                'menuUrl' => $this->container->get('request')->getBaseUrl(),
             ]
         );
     }

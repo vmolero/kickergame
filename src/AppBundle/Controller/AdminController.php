@@ -23,9 +23,24 @@ class AdminController extends Controller
         return $this->render(
             'admin/index.html.twig',
             [
-                'url' => $request->getBaseUrl().'/register',
+                'baseUrl' => $request->getBaseUrl(),
+                'registerUrl' => '/register',
+                'showPlayersUrl' => '/admin/players',
             ]
         );
+    }
+
+    /**
+     * @Security("has_role('ROLE_ADMIN')")
+     * @Route("/admin/players", name="showPlayers")
+     */
+    public function showPlayersAction(Request $request)
+    {
+        $r = ($this->getDoctrine()
+            ->getRepository('AppBundle:User')->findAll());
+
+        // ->findBy(['role' => Role::PLAYER]));
+        return $this->render('admin/players.html.twig', ['players' => $r]);
     }
 
 }

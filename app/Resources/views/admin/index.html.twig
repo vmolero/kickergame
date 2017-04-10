@@ -1,11 +1,11 @@
-{% extends 'base.html.twig' %}
+{% extends 'default/index.html.twig' %}
 
 {% block body %}
     <div id="wrapper">
         <div id="container">
             <ul>
-                <li><a href="{{ url }}">Register a new player</a></li>
-                <li>See all players</li>
+                <li><a href="{{ baseUrl ~ registerUrl }}">Register a new player</a></li>
+                <li><a href="{{ baseUrl ~ showPlayersUrl }}">See all players</a></li>
             </ul>
         </div>
     </div>
