@@ -10,8 +10,8 @@
                 <th>Id</th><th>Username</th><th>Full Name</th><th>Email</th>
                 </thead>
                 <tbody>
-                {% for player in players %}
-                    <tr><td>{{ player.id }} <a href="/player/{{ player.id }}/delete">Delete</a></td>
+                {% for game in games %}
+                    <tr><td>{{ player.id }} <a href="/game/{{ player.id }}/delete">Delete</a></td>
                         <td>{{ player.username }}</td>
                         <td>{{ player.fullName }}</td><td><a href="mailto:{{ player.email }}">{{ player.email }}</a></td>
                     </tr>
