@@ -2,11 +2,11 @@
 namespace AppBundle\Domain\Users;
 
 use AppBundle\Domain\Role;
-use AppBundle\Entity\User;
+use AppBundle\Domain\User;
 
 class Player extends User
 {
-    public function __construc()
+    public function __construct()
     {
         parent::addRole(Role::create(Role::PLAYER));
     }

@@ -1,0 +1,24 @@
+{% extends 'default/index.html.twig' %}
+
+{% block body %}
+    <div id="wrapper">
+        <div id="container">
+            <h2>Teams</h2>
+            <p><a href="{{ baseUrl ~ newTeamUrl }}">Create team</a></p>
+            <table class="table">
+                <thead>
+                <th>Id</th><th>Name</th><th colspan="2">Player 1</th><th colspan="2">Player 2</th>
+                </thead>
+                <tbody>
+                {% for team in teams %}
+                    <tr><td>{{ team.id }} <a href="/team/{{ team.id }}/delete">Delete</a></td>
+                        <td>{{ team.name }}</td>
+                        <td>{{ team.player1.username }}</td><td><a href="mailto:{{ team.player1.email }}">{{ team.player1.email }}</a></td>
+                        <td>{{ team.player2.username }}</td><td><a href="mailto:{{ team.player2.email }}">{{ team.player2.email }}</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

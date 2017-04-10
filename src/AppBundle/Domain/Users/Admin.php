@@ -2,7 +2,7 @@
 namespace AppBundle\Domain\Users;
 
 use AppBundle\Domain\Role;
-use AppBundle\Entity\User;
+use AppBundle\Domain\User;
 
 /**
  * Created by PhpStorm.
@@ -12,7 +12,7 @@ use AppBundle\Entity\User;
  */
 class Admin extends User
 {
-    public function __construc()
+    public function __construct()
     {
         parent::addRole(Role::create(Role::ADMIN));
     }
