@@ -1,11 +1,11 @@
 <?php
 
-namespace AppBundle\Test\Domain;
+namespace AppBundle\Tests\Domain;
 
 use AppBundle\Domain\Team;
 use AppBundle\Domain\Users\Player;
 
-class TeamTest extends \PHPUnit_Framework_TestCase
+class TeamTest extends DomainTestCase
 {
     public function testCreateTeam()
     {

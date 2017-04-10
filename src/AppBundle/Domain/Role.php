@@ -31,4 +31,7 @@ abstract class Role extends RoleModel implements RoleHolder
         return $c;
     }
 
+    public static function getValidRoles() {
+        return [self::ADMIN, self::PLAYER];
+    }
 }

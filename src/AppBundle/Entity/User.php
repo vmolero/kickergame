@@ -2,7 +2,6 @@
 
 namespace AppBundle\Entity;
 
-use AppBundle\Domain\Roles\RoleHolder;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Entity\User as BaseUser;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -60,15 +59,4 @@ class User extends BaseUser
 
         return $this;
     }
-
-    public function addRole($role)
-    {
-        if ($role instanceof RoleHolder) {
-            return parent::addRole($role->getCode());
-        }
-
-        return parent::addRole($role);
-    }
-
-
 }

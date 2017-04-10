@@ -1,24 +1,53 @@
 <?php
 
-namespace AppBundle\Test\Domain;
+namespace AppBundle\Tests\Domain;
 
 use AppBundle\Domain\Role;
-use AppBundle\Entity\User;
+use AppBundle\Domain\User;
 
-class UserTest extends \PHPUnit_Framework_TestCase
+class UserTest extends DomainTestCase
 {
-    public function setUp() {
+    private $user;
 
+    public function setUp()
+    {
+        $this->user = new User();
     }
 
     public function testAddRole()
     {
-        $role1 = Role::create('admin');
-        $role2 = Role::create('player')->getCode();
-        $user = new User();
+        $role1 = Role::create(Role::ADMIN);
+        $role2 = Role::create(Role::PLAYER)->getCode();
+        $user = $this->user;
         $user->addRole($role1);
         $user->addRole($role2);
         $roles = $user->getRoles();
         $this->assertEquals(['ROLE_ADMIN', 'ROLE_PLAYER'], $roles);
+    }
+
+    public function testIsValidUserRole()
+    {
+        $user =  $this->user;
+        $role1 = Role::create(Role::ADMIN);
+        $user->addRole($role1);
+        $this->assertTrue($this->invokeMethod($user, 'isValidRole', [$role1->getCode()]));
+    }
+
+    public function testIsValidStringRole()
+    {
+        $this->assertTrue($this->invokeMethod($this->user, 'isValidRole', ['ROLE_PLAYER']));
+    }
+
+    public function testIsInvalidDomainRole()
+    {
+        $this->assertFalse($this->invokeMethod($this->user, 'isValidRole', ['ROLE_NOT_DEFINED']));
+    }
+
+    public function testIsInvalidRole()
+    {
+        $this->assertFalse($this->invokeMethod($this->user, 'isValidRole', ['DOESNT_FOLLOW_CONVENTION']));
+        $this->assertFalse($this->invokeMethod($this->user, 'isValidRole', [null]));
+        $this->assertFalse($this->invokeMethod($this->user, 'isValidRole', [array('')]));
+        $this->assertFalse($this->invokeMethod($this->user, 'isValidRole', [0]));
     }
 }
