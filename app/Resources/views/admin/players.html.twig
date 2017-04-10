@@ -1,0 +1,22 @@
+{% extends 'default/index.html.twig' %}
+
+{% block body %}
+    <div id="wrapper">
+        <div id="container">
+            <h2>Player list</h2>
+            {{ dump(players) }}
+            <table class="table">
+                <thead>
+                <th>Id</th><th>Full Name</th>
+                </thead>
+                <tbody>
+                {% for player in players %}
+                    {{ dump(player) }}
+                    <tr><td>{{ player.id }} <a href="/review/{{ player.id }}/delete">Delete</a></td>
+                        <td>{{ player.fullName }}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

@@ -1,6 +1,7 @@
 {% extends "UserBundle::layout.html.twig" %}
 
 {% block fos_user_content %}
-{{ username is defined ? 'registration.complete'|trans({'%username%': username}, 'FOSUserBundle') }}
+{{ username is defined ? 'registration.completed'|trans({'%username%': username}, 'UserBundle') }}
 {% include "UserBundle:Registration:register_content.html.twig" %}
+<p><a href="{{ menuUrl }}/admin">Back to Menu</a></p>
 {% endblock fos_user_content %}

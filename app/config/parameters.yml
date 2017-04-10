@@ -1,0 +1,12 @@
+# This file is auto-generated during the composer install
+parameters:
+    database_host: 127.0.0.1
+    database_port: null
+    database_name: tvg_kickergame
+    database_user: root
+    database_password: 1234
+    mailer_transport: smtp
+    mailer_host: 127.0.0.1
+    mailer_user: vmolero
+    mailer_password: myPass
+    secret: 375f56c66101c05b8c14e1cffbe5f6d6d7770549
