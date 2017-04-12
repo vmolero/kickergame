@@ -3,8 +3,7 @@
 {% block body %}
     <div id="wrapper">
         <div id="container">
-            <h2>Player list</h2>
-            <p><a href="{{ baseUrl ~ registerUrl }}">Add player</a></p>
+            <h2>Game list</h2>
             <table class="table">
                 <thead>
                 <th>Id</th><th>Local</th><th>Visitor</th><th>Date</th><th>Score</th>
@@ -12,7 +11,7 @@
                 <tbody>
                 {% for game in games %}
                     <tr>
-                        <td>{{ game.id }} <a href="{{ baseUrl }}/game/{{ game.id }}/score">Edit score</a></td><td>{{ game.local.name }}</td><td>{{ game.visitor.name }}</td><td>{{ game.whenPlayed|date('Y-m-d') }}</td><td>{{ game.scoreLocal ~ ' - ' ~ game.scoreVisitor }}</td>
+                        <td>{{ game.id }}</td><td>{{ game.local.name }}</td><td>{{ game.visitor.name }}</td><td>{{ game.whenPlayed|date('Y-m-d') }}</td><td>{{ game.scoreLocal ~ ' - ' ~ game.scoreVisitor }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>

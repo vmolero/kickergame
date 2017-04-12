@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use AppBundle\Entity\Interfaces\StorableGame;
 use AppBundle\Entity\Interfaces\TeamHolder;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -72,7 +73,7 @@ class Game implements StorableGame
      * @param mixed $local
      * @return Game
      */
-    public function setLocal($local)
+    public function setLocal(TeamHolder $local)
     {
         $this->local = $local;
 
@@ -91,7 +92,7 @@ class Game implements StorableGame
      * @param mixed $visitor
      * @return Game
      */
-    public function setVisitor($visitor)
+    public function setVisitor(TeamHolder $visitor)
     {
         $this->visitor = $visitor;
 
@@ -148,7 +149,7 @@ class Game implements StorableGame
      * @param mixed $whenPlayed
      * @return Game
      */
-    public function setWhenPlayed($whenPlayed)
+    public function setWhenPlayed(DateTime $whenPlayed)
     {
         $this->whenPlayed = $whenPlayed;
 

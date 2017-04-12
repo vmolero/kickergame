@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\TeamRepository")
  * @ORM\Table(name="team",
  *            indexes={@ORM\Index(name="team_idx2", columns={"player1", "player2"})},
  *            uniqueConstraints={@ORM\UniqueConstraint(name="unique_player1_player2_1", columns={"player1", "player2"})}
@@ -28,12 +28,12 @@ class Team implements TeamHolder
     protected $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="id", cascade={"persist"})
      * @ORM\JoinColumn(name="player1", referencedColumnName="id")
      */
     protected $player1;
     /**
-     * @ORM\ManyToOne(targetEntity="User", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="id", cascade={"persist"})
      * @ORM\JoinColumn(name="player2", referencedColumnName="id")
      */
     protected $player2;

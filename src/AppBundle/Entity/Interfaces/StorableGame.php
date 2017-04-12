@@ -16,24 +16,13 @@ interface StorableGame
     /**
      * @return mixed
      */
-    public function getId();
-
-    /**
-     * @param mixed $id
-     * @return Game
-     */
-    public function setId($id);
-
-    /**
-     * @return mixed
-     */
     public function getLocal();
 
     /**
      * @param mixed $local
      * @return Game
      */
-    public function setLocal($local);
+    public function setLocal(TeamHolder $local);
 
     /**
      * @return mixed
@@ -44,7 +33,7 @@ interface StorableGame
      * @param mixed $visitor
      * @return Game
      */
-    public function setVisitor($visitor);
+    public function setVisitor(TeamHolder $visitor);
 
     /**
      * @return mixed
@@ -77,5 +66,5 @@ interface StorableGame
      * @param mixed $whenPlayed
      * @return Game
      */
-    public function setWhenPlayed($whenPlayed);
+    public function setWhenPlayed(\DateTime $whenPlayed);
 }

@@ -106,7 +106,10 @@ class AdminController extends Controller
             ->getRepository('AppBundle:User')->findByRole(Role::PLAYER)]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getRepository('AppBundle:Game')->saveUsingFormData($form->getData());
+            $data = $form->getData();
+            $localTeam = $this->getDoctrine()->getRepository('AppBundle:Team')->fetchTeamsIfExist($data['player1'], $data['player2']);
+            $visitorTeam = $this->getDoctrine()->getRepository('AppBundle:Team')->fetchTeamsIfExist($data['player3'], $data['player4']);
+            $this->getDoctrine()->getRepository('AppBundle:Game')->saveUsingFormData($data + ['local' => $localTeam, 'visitor' => $visitorTeam]);
         }
         return $this->render(
             'teams/new.html.twig',

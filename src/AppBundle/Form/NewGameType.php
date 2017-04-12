@@ -6,6 +6,7 @@ use FOS\UserBundle\Model\UserInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -91,6 +92,16 @@ class NewGameType extends AbstractType
                     'placeholder' => 'Choose a player',
                     'label' => 'Visitor player 2'
                 ]
+            )
+            ->add(
+                'localScore',
+                NumberType::class,
+                ['required' => false]
+            )
+            ->add(
+                'visitorScore',
+                NumberType::class,
+                ['required' => false]
             )
             ->add('when',
                   DateTimeType::class)
