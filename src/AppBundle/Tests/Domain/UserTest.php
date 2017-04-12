@@ -2,8 +2,8 @@
 
 namespace AppBundle\Tests\Domain;
 
-use AppBundle\Domain\Role;
-use AppBundle\Domain\User;
+use AppBundle\Entity\Role;
+use AppBundle\Entity\User;
 
 class UserTest extends DomainTestCase
 {
@@ -17,7 +17,7 @@ class UserTest extends DomainTestCase
     public function testAddRole()
     {
         $role1 = Role::create(Role::ADMIN);
-        $role2 = Role::create(Role::PLAYER)->getCode();
+        $role2 = Role::create(Role::PLAYER)->getType();
         $user = $this->user;
         $user->addRole($role1);
         $user->addRole($role2);
@@ -30,7 +30,7 @@ class UserTest extends DomainTestCase
         $user =  $this->user;
         $role1 = Role::create(Role::ADMIN);
         $user->addRole($role1);
-        $this->assertTrue($this->invokeMethod($user, 'isValidRole', [$role1->getCode()]));
+        $this->assertTrue($this->invokeMethod($user, 'isValidRole', [$role1->getType()]));
     }
 
     public function testIsValidStringRole()

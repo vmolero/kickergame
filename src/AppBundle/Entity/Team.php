@@ -2,13 +2,18 @@
 
 namespace AppBundle\Entity;
 
+use AppBundle\Entity\Interfaces\TeamHolder;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="tvg_team")
+ * @ORM\Table(name="team",
+ *            indexes={@ORM\Index(name="team_idx2", columns={"player1", "player2"})},
+ *            uniqueConstraints={@ORM\UniqueConstraint(name="unique_player1_player2_1", columns={"player1", "player2"})}
+ *           )
  */
-class Team
+class Team implements TeamHolder
 {
     /**
      * @ORM\Id
@@ -18,7 +23,7 @@ class Team
     protected $id;
 
     /**
-     * @ORM\Column(name="name")
+     * @ORM\Column(name="name", nullable=true)
      */
     protected $name;
 
@@ -32,6 +37,12 @@ class Team
      * @ORM\JoinColumn(name="player2", referencedColumnName="id")
      */
     protected $player2;
+
+    public function __construct(UserInterface $player1 = null, UserInterface $player2 = null)
+    {
+        $this->player1 = $player1;
+        $this->player2 = $player2;
+    }
 
     /**
      * @return mixed
@@ -83,7 +94,7 @@ class Team
      * @param mixed $player1
      * @return Team
      */
-    public function setPlayer1($player1)
+    public function setPlayer1(UserInterface $player1)
     {
         $this->player1 = $player1;
 
@@ -102,10 +113,15 @@ class Team
      * @param mixed $player2
      * @return Team
      */
-    public function setPlayer2($player2)
+    public function setPlayer2(UserInterface $player2)
     {
         $this->player2 = $player2;
 
         return $this;
+    }
+
+    public function hasConflicts()
+    {
+        return $this->player1 === $this->player2;
     }
 }

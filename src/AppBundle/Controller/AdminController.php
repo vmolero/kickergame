@@ -2,14 +2,14 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Domain\Users\Player;
+use AppBundle\Entity\Role;
+use AppBundle\Entity\Game;
 use AppBundle\Entity\Team;
-use FOS\UserBundle\Model\UserInterface;
+use AppBundle\Form\NewGameType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -44,9 +44,8 @@ class AdminController extends Controller
     public function showPlayersAction(Request $request)
     {
         $r = ($this->getDoctrine()
-            ->getRepository('AppBundle:User')->findAll());
+            ->getRepository('AppBundle:User')->findByRole(Role::PLAYER));
 
-        // ->findBy(['role' => Role::PLAYER]));
         return $this->render(
             'admin/players.html.twig',
             [
@@ -83,7 +82,7 @@ class AdminController extends Controller
      */
     public function showGamesAction(Request $request)
     {
-        $r = ($this->getDoctrine()
+        $games = ($this->getDoctrine()
             ->getRepository('AppBundle:Game')->findAll());
 
         // ->findBy(['role' => Role::PLAYER]));
@@ -92,52 +91,23 @@ class AdminController extends Controller
             [
                 'baseUrl' => $request->getBaseUrl(),
                 'registerUrl' => '/register',
-                'games' => $r,
+                'games' => $games,
             ]
         );
     }
 
     /**
      * @Security("has_role('ROLE_ADMIN')")
-     * @Route("/admin/teams/new", name="addTeam")
+     * @Route("/admin/games/new", name="addTeam")
      */
-    public function showFormNewTeamAction()
+    public function showFormNewGameAction(Request $request)
     {
-        $team = new Team();
-        $player1 = new Player();
-        $player1->setFullName('Víctor')->setUsername('vmolero');
-        $player2 = new Player();
-        $player2->setFullName('Pepe')->setUsername('pepe');
-        $player3 = new Player();
-        $player3->setFullName('Alberto')->setUsername('albelcro');
-        $players = [$player2, $player1, $player3];
-        $form = $this->createFormBuilder($team)
-            // ->add('name', TextType::class)
-            ->add(
-                'player1',
-                ChoiceType::class,
-                [
-                    'choices' => $players,
-                    'choices_as_values' => true,
-                    'choice_label' => function (UserInterface $player, $key, $index) {
-                        echo $player->getFullName();
-
-                        return $player->getFullName();
-                    },
-                    'choice_value' => function ($value) {
-                        if ($value instanceof UserInterface) {
-                            return $value->getId();
-                        }
-
-                        return null;
-                    },
-                    'placeholder' => 'Choose a player',
-                ]
-            )
-            // ->add('player2', ChoiceType::class)
-            ->add('save', SubmitType::class, array('label' => 'Create Team'))
-            ->getForm();
-
+        $form = $this->createForm(NewGameType::class, ['players' => $this->getDoctrine()
+            ->getRepository('AppBundle:User')->findByRole(Role::PLAYER)]);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->getDoctrine()->getRepository('AppBundle:Game')->saveUsingFormData($form->getData());
+        }
         return $this->render(
             'teams/new.html.twig',
             array(
