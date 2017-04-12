@@ -10,21 +10,42 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  *
  */
-class AdminController extends Controller
+class PlayerController extends Controller
 {
     /**
      * @Security("has_role('ROLE_PLAYER')")
-     * @Route("/players/", name="playersHomepage")
+     * @Route("/players", name="playersHomepage")
      */
     public function indexAction(Request $request)
     {
 
         !$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') &&
-            $this->redirect($request->getBaseUrl().'/login');
+        $this->redirect($request->getBaseUrl().'/login');
+
         return $this->render(
             'players/index.html.twig',
             [
+                'url' => $request->getBaseUrl().'/players/games',
+            ]
+        );
+    }
+
+    /**
+     * @Security("has_role('ROLE_PLAYER')")
+     * @Route("/players/games", name="playerGames")
+     */
+    public function gamesAction(Request $request)
+    {
+
+        !$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') &&
+        $this->redirect($request->getBaseUrl().'/login');
+        $games = ($this->getDoctrine()
+            ->getRepository('AppBundle:Game')->findAll());
+        return $this->render(
+            'players/games.html.twig',
+            [
                 'url' => $request->getBaseUrl().'/games',
+                'games' => $games,
             ]
         );
     }

@@ -2,16 +2,16 @@
 
 namespace AppBundle\Tests\Domain;
 
-use AppBundle\Domain\Team;
-use AppBundle\Domain\Users\Player;
+use AppBundle\Entity\Team;
+use AppBundle\Entity\User;
 
 class TeamTest extends DomainTestCase
 {
     public function testCreateTeam()
     {
-        $player1 = new Player();
+        $player1 = User::createPlayer();
         $player1->setFullname('Pepito palotes');
-        $player2 = new Player();
+        $player2 = User::createPlayer();
         $player2->setFullname('Pepito grillo');
 
 

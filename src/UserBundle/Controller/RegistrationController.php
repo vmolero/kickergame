@@ -3,9 +3,11 @@
 namespace UserBundle\Controller;
 
 use FOS\UserBundle\Controller\RegistrationController as BaseController;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class RegistrationController extends BaseController
 {
@@ -51,15 +53,15 @@ class RegistrationController extends BaseController
 
     /**
      * Tell the user his account is now confirmed
+     * @Security("has_role('ROLE_ADMIN')")
      */
     public function confirmedAction()
     {
         $user = $this->container->get('security.context')->getToken()->getUser();
-        if (!is_object($user) || !$user instanceof UserInterface) {
-            throw new AccessDeniedException('This user does not have access to this section.');
-        }
-        $this->setFlash('fos_user_username', $user->getUsername());
 
+        if (is_object($user) && $user instanceof UserInterface) {
+            $this->setFlash('fos_user_username', $user->getUsername());
+        }
         $request = $this->container->get('request');
         return new RedirectResponse($request->getBaseUrl().'/register');
     }

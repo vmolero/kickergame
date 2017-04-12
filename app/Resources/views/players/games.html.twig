@@ -1,0 +1,21 @@
+{% extends 'default/index.html.twig' %}
+
+{% block body %}
+    <div id="wrapper">
+        <div id="container">
+            <h2>Game list</h2>
+            <table class="table">
+                <thead>
+                <th>Id</th><th>Local</th><th>Visitor</th><th>Date</th><th>Score</th>
+                </thead>
+                <tbody>
+                {% for game in games %}
+                    <tr>
+                        <td>{{ game.id }}</td><td>{{ game.local.name }}</td><td>{{ game.visitor.name }}</td><td>{{ game.whenPlayed|date('Y-m-d') }}</td><td>{{ game.scoreLocal ~ ' - ' ~ game.scoreVisitor }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

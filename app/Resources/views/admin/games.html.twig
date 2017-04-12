@@ -7,13 +7,12 @@
             <p><a href="{{ baseUrl ~ registerUrl }}">Add player</a></p>
             <table class="table">
                 <thead>
-                <th>Id</th><th>Username</th><th>Full Name</th><th>Email</th>
+                <th>Id</th><th>Local</th><th>Visitor</th><th>Date</th><th>Score</th>
                 </thead>
                 <tbody>
-                {% for player in players %}
-                    <tr><td>{{ player.id }} <a href="/player/{{ player.id }}/delete">Delete</a></td>
-                        <td>{{ player.username }}</td>
-                        <td>{{ player.fullName }}</td><td><a href="mailto:{{ player.email }}">{{ player.email }}</a></td>
+                {% for game in games %}
+                    <tr>
+                        <td>{{ game.id }} <a href="{{ baseUrl }}/game/{{ game.id }}/score">Edit score</a></td><td>{{ game.local.name }}</td><td>{{ game.visitor.name }}</td><td>{{ game.whenPlayed|date('Y-m-d') }}</td><td>{{ game.scoreLocal ~ ' - ' ~ game.scoreVisitor }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>

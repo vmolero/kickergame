@@ -3,13 +3,14 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use AppBundle\Entity\Interfaces\RoleHolder;
 use FOS\UserBundle\Entity\User as BaseUser;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
 /**
- * @ORM\Entity
- * @ORM\Table(name="tvg_user")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
+ * @ORM\Table(name="user")
  */
 class User extends BaseUser
 {
@@ -35,10 +36,18 @@ class User extends BaseUser
      */
     protected $fullName;
 
-    public function __construct()
+    public static function createPlayer()
     {
-        parent::__construct();
-        // your own logic
+        $player = new User();
+        $player->addRole(Role::create(Role::PLAYER));
+        return $player;
+    }
+
+    public static function createAdmin()
+    {
+        $user = new User();
+        $user->addRole(Role::create(Role::ADMIN));
+        return $user;
     }
 
     /**
@@ -58,5 +67,45 @@ class User extends BaseUser
         $this->fullName = $fullName;
 
         return $this;
+    }
+
+    public function addRole($role)
+    {
+        is_string($role) && ($role = Role::create($role));
+        return $this->addToRoleArray($role);
+    }
+
+    private function addToRoleArray(RoleHolder $role)
+    {
+        $roleCode = strtoupper($role->getType());
+        if (!in_array($roleCode, $this->roles, true) &&
+            $this->isValidRole($roleCode)) {
+            $this->roles[] = $roleCode;
+        }
+
+        return $this;
+    }
+
+    private function isValidRole($roleCode) {
+        return is_string($roleCode) &&
+            in_array($roleCode, Role::getValidRoles()) &&
+            preg_match('/^ROLE\_/', $roleCode) === 1;
+    }
+
+    /**
+     * Returns the user roles
+     *
+     * @return array The roles
+     */
+    public function getRoles()
+    {
+        $roles = $this->roles;
+        foreach ($this->getGroups() as $group) {
+            $roles = array_merge($roles, $group->getRoles());
+        }
+        // we need to make sure to have at least one role
+        $roles[] = Role::PLAYER;
+
+        return array_unique($roles);
     }
 }
