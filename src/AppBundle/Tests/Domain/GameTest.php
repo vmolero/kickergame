@@ -14,7 +14,7 @@ class GameTest extends DomainTestCase
     public function setUp()
     {
         $this->game = new Game();
-        $this->game->setWhenPlayed('Y-m-d H:i:s');
+        $this->game->setWhenPlayed(new \DateTime());
     }
 
     public function testHasNoConflictsVisitorConflict()

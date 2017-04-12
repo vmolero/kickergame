@@ -4,6 +4,7 @@
     <div id="wrapper">
         <div id="container">
             <h2>Game list</h2>
+            <p><a href="{{ baseUrl }}/players/games">Show all</a> | <a href="{{ baseUrl }}/players/games/{{ app.user.id }}">Only mine</a></p>
             <table class="table">
                 <thead>
                 <th>Id</th><th>Local</th><th>Visitor</th><th>Date</th><th>Score</th>
