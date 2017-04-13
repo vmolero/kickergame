@@ -5,6 +5,7 @@ parameters:
     database_name: tvg_kickergame
     database_user: root
     database_password: 1234
+    database_path: '%kernel.root_dir%/Resources/db/tvg_kickergame.db'
     mailer_transport: smtp
     mailer_host: 127.0.0.1
     mailer_user: vmolero
