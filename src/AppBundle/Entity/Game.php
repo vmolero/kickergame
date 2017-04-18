@@ -43,6 +43,15 @@ class Game implements StorableGame
     protected $whenPlayed;
 
     /**
+     * Game constructor.
+     */
+    public function __construct()
+    {
+        $this->whenPlayed = new DateTime();
+    }
+
+
+    /**
      * @return mixed
      */
     public function getId()
@@ -156,15 +165,15 @@ class Game implements StorableGame
         return $this;
     }
 
-    public function hasConflicts(TeamHolder $local, TeamHolder $visitor)
+    public function hasConflicts()
     {
         return in_array(
-                $local->getPlayer1()->getUsername(),
-                [$visitor->getPlayer1()->getUsername(), $visitor->getPlayer2()->getUsername()]
+                $this->local->getPlayer1()->getUsername(),
+                [$this->visitor->getPlayer1()->getUsername(), $this->visitor->getPlayer2()->getUsername()]
             ) ||
             in_array(
-                $local->getPlayer2()->getUsername(),
-                [$visitor->getPlayer1()->getUsername(), $visitor->getPlayer2()->getUsername()]
+                $this->local->getPlayer2()->getUsername(),
+                [$this->visitor->getPlayer1()->getUsername(), $this->visitor->getPlayer2()->getUsername()]
             );
     }
 }

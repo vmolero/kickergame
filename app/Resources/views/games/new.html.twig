@@ -1,8 +1,11 @@
 {% extends 'default/index.html.twig' %}
 
 {% block body %}
-{{ form_start(form) }}
-{{ form_widget(form) }}
-{{ form_end(form) }}
-<p><a href="{{ baseUrl }}/admin">Back to menu</a></p>
+    {% for flashMessage in app.session.flashbag.get('registrationMessage') %}
+        {{ flashMessage }}
+    {% endfor %}
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
+    <p><a href="{{ baseUrl }}/admin/games">See games</a> | <a href="{{ baseUrl }}/admin">Back to menu</a></p>
 {% endblock %}

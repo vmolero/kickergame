@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Game;
+use AppBundle\Entity\Interfaces\TeamHolder;
 use AppBundle\Entity\Role;
 use AppBundle\Form\GameType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -100,26 +102,24 @@ class AdminController extends Controller
     {
         $form = $this->createForm(
             GameType::class,
-            [
-                'players' => $this->getDoctrine()
-                    ->getRepository('AppBundle:User')->findByRole(Role::PLAYER),
-            ]
+            new Game(),
+            ['players' => $this->getDoctrine()
+                ->getRepository('AppBundle:User')->findByRole(Role::PLAYER)]
         )
             ->add('save', SubmitType::class, array('label' => 'Create Game'));
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $localTeam = $this->getDoctrine()->getRepository('AppBundle:Team')->fetchTeamsIfExist(
-                $data['player1'],
-                $data['player2']
-            );
-            $visitorTeam = $this->getDoctrine()->getRepository('AppBundle:Team')->fetchTeamsIfExist(
-                $data['player3'],
-                $data['player4']
-            );
-            $this->getDoctrine()->getRepository('AppBundle:Game')->saveUsingFormData(
-                $data + ['local' => $localTeam, 'visitor' => $visitorTeam]
-            );
+            $em = $this->getDoctrine()->getManager();
+            /** @var Game $game */
+            $game = $form->getData();
+            if (!$game->hasConflicts()) {
+                $this->getDoctrine()->getRepository('AppBundle:Team')->useExistingTeamsFor($game);
+                $em->persist($game);
+                $em->flush();
+                $this->get('session')->getFlashBag()->set('registrationMessage', 'Game saved');
+            } else {
+                $this->get('session')->getFlashBag()->set('registrationMessage', 'Game has team conflicts');
+            }
         }
 
         return $this->render(

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form;
 
+use AppBundle\Entity\Team;
 use FOS\UserBundle\Model\UserInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -11,20 +12,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TeamType extends AbstractType
 {
-    private $players;
-
-    public function __construct(array $players)
-    {
-        $this->players = $players;
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $players = $options['players'];
+        $label = $options['label'];
         $builder->add(
             'player1',
             ChoiceType::class,
             [
-                'choices' => $this->players,
+                'choices' => $players,
                 'choices_as_values' => true,
                 'choice_label' => function (UserInterface $player, $key, $index) {
                     return $player->getFullName();
@@ -37,14 +33,14 @@ class TeamType extends AbstractType
                     return null;
                 },
                 'placeholder' => 'Choose a player',
-                'label' => 'Local player 1',
+                'label' => 'Defender',
             ]
         )
             ->add(
                 'player2',
                 ChoiceType::class,
                 [
-                    'choices' => $this->players,
+                    'choices' => $players,
                     'choices_as_values' => true,
                     'choice_label' => function (UserInterface $player, $key, $index) {
                         return $player->getFullName();
@@ -57,7 +53,7 @@ class TeamType extends AbstractType
                         return null;
                     },
                     'placeholder' => 'Choose a player',
-                    'label' => 'Local player 2',
+                    'label' => 'Attacker',
                 ]
             );
     }
@@ -74,7 +70,7 @@ class TeamType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
+        $resolver->setRequired('players')->setDefaults([
             'data_class' => Team::class,
         ]);
     }

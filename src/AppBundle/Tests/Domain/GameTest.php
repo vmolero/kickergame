@@ -27,7 +27,7 @@ class GameTest extends DomainTestCase
         $visitor->setPlayer2(User::createPlayer()->setUsername('local1'));
         $this->game->setLocal($local);
         $this->game->setVisitor($visitor);
-        $this->assertTrue($this->game->hasConflicts($local, $visitor));
+        $this->assertTrue($this->game->hasConflicts());
     }
 }
 
