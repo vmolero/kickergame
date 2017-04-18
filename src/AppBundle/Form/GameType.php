@@ -2,107 +2,52 @@
 
 namespace AppBundle\Form;
 
-use FOS\UserBundle\Model\UserInterface;
+use AppBundle\Entity\Game;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 
 class GameType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add(
-                'player1',
-                ChoiceType::class,
+        $players = $options['players'];
+
+        $builder
+            ->add(
+                'local',
+                TeamType::class,
                 [
-                    'choices' => $options['data']['players'],
-                    'choices_as_values' => true,
-                    'choice_label' => function (UserInterface $player, $key, $index) {
-                        return $player->getFullName();
-                    },
-                    'choice_value' => function ($value) {
-                        if ($value instanceof UserInterface) {
-                            return $value->getId();
-                        }
-                        return null;
-                    },
-                    'placeholder' => 'Choose a player',
-                    'label' => 'Local player 1'
+                    'players' => $players,
+                    'label' => 'Local player',
                 ]
             )
             ->add(
-                'player2',
-                ChoiceType::class,
+                'visitor',
+                TeamType::class,
                 [
-                    'choices' => $options['data']['players'],
-                    'choices_as_values' => true,
-                    'choice_label' => function (UserInterface $player, $key, $index) {
-                        return $player->getFullName();
-                    },
-                    'choice_value' => function ($value) {
-                        if ($value instanceof UserInterface) {
-                            return $value->getId();
-                        }
-                        return null;
-                    },
-                    'placeholder' => 'Choose a player',
-                    'label' => 'Local player 2'
+                    'players' => $players,
+                    'label' => 'Visitor player',
                 ]
             )
             ->add(
-                'player3',
-                ChoiceType::class,
-                [
-                    'choices' => $options['data']['players'],
-                    'choices_as_values' => true,
-                    'choice_label' => function (UserInterface $player, $key, $index) {
-                        return $player->getFullName();
-                    },
-                    'choice_value' => function ($value) {
-                        if ($value instanceof UserInterface) {
-                            return $value->getId();
-                        }
-                        return null;
-                    },
-                    'placeholder' => 'Choose a player',
-                    'label' => 'Visitor player 1'
-                ]
-            )
-            ->add(
-                'player4',
-                ChoiceType::class,
-                [
-                    'choices' => $options['data']['players'],
-                    'choices_as_values' => true,
-                    'choice_label' => function (UserInterface $player, $key, $index) {
-                        return $player->getFullName();
-                    },
-                    'choice_value' => function ($value) {
-                        if ($value instanceof UserInterface) {
-                            return $value->getId();
-                        }
-                        return null;
-                    },
-                    'placeholder' => 'Choose a player',
-                    'label' => 'Visitor player 2'
-                ]
-            )
-            ->add(
-                'localScore',
+                'scoreLocal',
                 NumberType::class,
                 ['required' => false]
             )
             ->add(
-                'visitorScore',
+                'scoreVisitor',
                 NumberType::class,
                 ['required' => false]
             )
-            ->add('when',
-                  DateTimeType::class)
+            ->add(
+                'whenPlayed',
+                DateTimeType::class
+            )
             ->add('save', SubmitType::class, array('label' => 'Create Game'));
     }
 
@@ -113,6 +58,14 @@ class GameType extends AbstractType
 
     public function getBlockPrefix()
     {
-        return 'new_game_form';
+        return 'game_form';
     }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setRequired('players')->setDefaults([
+            'data_class' => Game::class,
+        ]);
+    }
+
 }
