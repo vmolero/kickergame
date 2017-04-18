@@ -68,6 +68,9 @@ class Team implements TeamHolder
      */
     public function getName()
     {
+        if (null === $this->name) {
+            return $this->player1->getUsername().'+'.$this->player2->getUsername();
+        }
         return $this->name;
     }
 
