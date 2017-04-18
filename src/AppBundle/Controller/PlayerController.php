@@ -33,7 +33,7 @@ class PlayerController extends Controller
     /**
      * @Security("has_role('ROLE_PLAYER')")
      * @Route("/players/games", name="playerGames")
-     * @Route("/players/games/{id}", name="specificPlayerGames")
+     * @Route("/players/{id}/games", name="specificPlayerGames")
      */
     public function gamesAction(Request $request, $id = null)
     {
@@ -41,7 +41,8 @@ class PlayerController extends Controller
         $this->redirect($request->getBaseUrl().'/login');
         $gameRepo = $this->getDoctrine()
             ->getRepository('AppBundle:Game');
-        $games = $id ? $gameRepo->findBy(['id' => $id]) : $gameRepo->findAll();
+        $games = $id ? $gameRepo->findAllGamesByPlayer($id) : $gameRepo->findAll();
+
         return $this->render(
             'players/games.html.twig',
             [

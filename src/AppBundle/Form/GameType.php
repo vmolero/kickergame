@@ -11,12 +11,10 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 
-class NewGameType extends AbstractType
+class GameType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        // var_dump($options);
-        //die;
         $builder->add(
                 'player1',
                 ChoiceType::class,

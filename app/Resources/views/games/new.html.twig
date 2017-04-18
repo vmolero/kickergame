@@ -1,0 +1,8 @@
+{% extends 'default/index.html.twig' %}
+
+{% block body %}
+{{ form_start(form) }}
+{{ form_widget(form) }}
+{{ form_end(form) }}
+<p><a href="{{ baseUrl }}/admin">Back to menu</a></p>
+{% endblock %}
