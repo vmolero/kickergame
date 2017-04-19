@@ -167,7 +167,9 @@ class Game implements StorableGame
 
     public function hasConflicts()
     {
-        return in_array(
+        return $this->local->hasConflicts() ||
+            $this->visitor->hasConflicts() ||
+            in_array(
                 $this->local->getPlayer1()->getUsername(),
                 [$this->visitor->getPlayer1()->getUsername(), $this->visitor->getPlayer2()->getUsername()]
             ) ||

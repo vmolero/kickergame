@@ -2,10 +2,9 @@
 
 namespace UserBundle\Controller;
 
+use Exception;
 use FOS\UserBundle\Controller\RegistrationController as BaseController;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -20,27 +19,23 @@ class RegistrationController extends BaseController
         $form = $this->container->get('fos_user.registration.form');
         $formHandler = $this->container->get('fos_user.registration.form.handler');
         $confirmationEnabled = $this->container->getParameter('fos_user.registration.confirmation.enabled');
-
-        $process = $formHandler->process($confirmationEnabled);
+        try {
+            $process = $formHandler->process($confirmationEnabled);
+        } catch (Exception $e) {
+            $process = false;
+            $this->setFlash('fos_user_success', 'User validation failed: '.$e->getMessage());
+        }
         if ($process) {
-            $user = $form->getData();
-
-            $authUser = false;
-            if ($confirmationEnabled) {
-                $this->container->get('session')->set('fos_user_send_confirmation_email/email', $user->getEmail());
-                $route = 'fos_user_registration_check_email';
-            } else {
-                $authUser = true;
-                $route = 'fos_user_registration_confirmed';
-            }
-
+            $route = 'fos_user_registration_confirmed';
             $this->setFlash('fos_user_success', 'registration.flash.user_created');
             $url = $this->container->get('router')->generate($route);
             $response = new RedirectResponse($url);
 
             return $response;
         }
+
         $username = $this->getFlash('fos_user_username');
+
         return $this->container->get('templating')->renderResponse(
             'UserBundle:Registration:register.html.'.$this->getEngine(),
             [
@@ -49,6 +44,14 @@ class RegistrationController extends BaseController
                 'menuUrl' => $this->container->get('request')->getBaseUrl(),
             ]
         );
+    }
+
+    /**
+     * @param string $action
+     */
+    private function getFlash($action)
+    {
+        $this->container->get('session')->getFlashBag()->get($action);
     }
 
     /**
@@ -63,14 +66,8 @@ class RegistrationController extends BaseController
             $this->setFlash('fos_user_username', $user->getUsername());
         }
         $request = $this->container->get('request');
+
         return new RedirectResponse($request->getBaseUrl().'/register');
     }
 
-    /**
-     * @param string $action
-     */
-    private function getFlash($action)
-    {
-        $this->container->get('session')->getFlashBag()->get($action);
-    }
 }

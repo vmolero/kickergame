@@ -103,9 +103,6 @@ class User extends BaseUser
         foreach ($this->getGroups() as $group) {
             $roles = array_merge($roles, $group->getRoles());
         }
-        // we need to make sure to have at least one role
-        $roles[] = Role::PLAYER;
-
         return array_unique($roles);
     }
 }
