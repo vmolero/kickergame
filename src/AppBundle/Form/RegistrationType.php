@@ -35,6 +35,7 @@ class RegistrationType extends AbstractType
                 'choice_attr' => function (RoleHolder $role, $key, $index) {
                     return ['class' => 'role_holder'];
                 },
+                'required' => true,
                 'placeholder' => 'Choose your role',
                 'expanded' => true,
                 'multiple' => true,
