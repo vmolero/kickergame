@@ -6,6 +6,7 @@ use AppBundle\Entity\Interfaces\StorableGame;
 use AppBundle\Entity\Interfaces\TeamHolder;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass="AppBundle\Repository\GameRepository")
@@ -13,6 +14,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Game implements StorableGame
 {
+    const OPEN = 1;
+    const CLOSED = 0;
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -41,6 +45,22 @@ class Game implements StorableGame
      * @ORM\Column(name="when_played", type="datetime", nullable=true)
      */
     protected $whenPlayed;
+    /**
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="id")
+     * @ORM\JoinColumn(name="created_by", referencedColumnName="id", nullable=false)
+     */
+    protected $createdBy;
+    /**
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="id")
+     * @ORM\JoinColumn(name="confirmed_by", referencedColumnName="id")
+     */
+    protected $confirmedBy;
+
+    /**
+     * @ORM\Column(name="status", type="smallint", nullable=false, options={"default": 1,
+     *                                                             "comment":"Status of the game 0 Closed, 1 Open"})
+     */
+    protected $status = self::OPEN;
 
     /**
      * Game constructor.
@@ -49,7 +69,6 @@ class Game implements StorableGame
     {
         $this->whenPlayed = new DateTime();
     }
-
 
     /**
      * @return mixed
@@ -165,17 +184,99 @@ class Game implements StorableGame
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getCreatedBy()
+    {
+        return $this->createdBy;
+    }
+
+    /**
+     * @param mixed $createdBy
+     * @return Game
+     */
+    public function setCreatedBy(UserInterface $createdBy)
+    {
+        $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getConfirmedBy()
+    {
+        return $this->confirmedBy;
+    }
+
+    /**
+     * @param mixed $confirmedBy
+     * @return Game
+     */
+    public function setConfirmedBy(UserInterface $confirmedBy)
+    {
+        $this->confirmedBy = $confirmedBy;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param mixed $status
+     * @return Game
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
     public function hasConflicts()
     {
-        return $this->local->hasConflicts() ||
-            $this->visitor->hasConflicts() ||
-            in_array(
-                $this->local->getPlayer1()->getUsername(),
-                [$this->visitor->getPlayer1()->getUsername(), $this->visitor->getPlayer2()->getUsername()]
-            ) ||
-            in_array(
-                $this->local->getPlayer2()->getUsername(),
-                [$this->visitor->getPlayer1()->getUsername(), $this->visitor->getPlayer2()->getUsername()]
-            );
+        return $this->visitor->hasConflicts() ||
+            $this->local->hasConflicts() ||
+            $this->isThereAPlayerInBothTeams();
+    }
+
+    private function isThereAPlayerInBothTeams() {
+        return $this->local->hasPlayer($this->visitor->getPlayer1()) ||
+            $this->local->hasPlayer($this->visitor->getPlayer2()) ||
+            $this->visitor->hasPlayer($this->local->getPlayer1()) ||
+            $this->visitor->hasPlayer($this->local->getPlayer2());
+    }
+
+    public function canBeConfirmedBy(UserInterface $player)
+    {
+        if ($this->isConfirmed()) {
+            return false;
+        }
+        $can = $player->hasRole(Role::PLAYER);
+        $userWhoCreated = $this->getCreatedBy();
+        return $can && $this->getLocal()->hasPlayer($player) && $this->getVisitor()->hasPlayer($userWhoCreated) ||
+         $this->getVisitor()->hasPlayer($player) && $this->getLocal()->hasPlayer($userWhoCreated);
+    }
+
+    private function isConfirmed()
+    {
+        return $this->getConfirmedBy() instanceof UserInterface;
+    }
+
+    /**
+     * @param UserInterface $player
+     * @return bool
+     */
+    public function hasPlayer(UserInterface $player)
+    {
+        return $this->local->hasPlayer($player) || $this->visitor->hasPlayer($player);
     }
 }

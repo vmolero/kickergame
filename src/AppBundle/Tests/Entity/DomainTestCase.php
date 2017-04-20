@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Tests\Domain;
+namespace AppBundle\Tests\Entity;
 
 use ReflectionClass;
 use Exception;
