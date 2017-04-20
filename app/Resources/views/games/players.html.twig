@@ -1,0 +1,39 @@
+{% extends 'default/index.html.twig' %}
+
+{% block body %}
+    <div id="wrapper">
+        <div id="container">
+            <h2>Game list</h2>
+            <p><a href="{{ baseUrl }}/{{ roleUrl }}/games/new">New game</a></p>
+            <p><a href="{{ baseUrl }}/{{ roleUrl }}/games">Show all</a> | <a href="{{ baseUrl }}/players/{{ app.user.id }}/games">Only mine</a></p>
+            <table class="table">
+                <thead>
+                <th>Id</th><th>Local</th><th>Visitor</th><th>Date</th><th>Score</th><th>Blame</th>
+                </thead>
+                <tbody>
+                {% dump(canConfirm) %}
+                {% for game in games %}
+                    <tr>
+                        <td>{{ game.id }}
+                            {% if (game.status == 1) %}
+                                PENDING
+                                {% if (canConfirm[game.id] is defined) %}
+                                    <a href="{{ baseUrl }}/game/{{ game.id }}/score/confirm?from={{ referrer|url_encode }}">Confirm score</a>
+                                    {% endif %}
+                            {%  else %}
+                                CLOSED
+                            {%  endif %}
+                        </td>
+                        <td>{{ game.local.name }}</td>
+                        <td>{{ game.visitor.name }}</td>
+                        <td>{{ game.whenPlayed|date('Y-m-d') }}</td>
+                        <td>{{ game.scoreLocal ~ ' - ' ~ game.scoreVisitor }}</td>
+                        <td>{{ game.createdBy.fullname }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <p><a href="{{ baseUrl }}/{{ roleUrl }}">Back to menu</a></p>
+        </div>
+    </div>
+{% endblock %}

@@ -22,19 +22,4 @@ class AccessController extends Controller
         return new RedirectResponse($request->getBaseUrl().$path);
     }
 
-    /**
-     * @Security("has_role('ROLE_PLAYER')")
-     * @Route("/players/", name="showGames")
-     */
-    public function playerHomepageAction(Request $request)
-    {
-
-        return $this->render('default/index.html.twig');
-
-        // replace this example code with whatever you need
-        // return $this->render('default/index.html.twig', array(
-        //    'base_dir' => realpath($this->container->getParameter('kernel.root_dir').'/..').DIRECTORY_SEPARATOR,
-        //));
-    }
-
 }

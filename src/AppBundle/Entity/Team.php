@@ -127,4 +127,9 @@ class Team implements TeamHolder
     {
         return $this->player1 === $this->player2;
     }
+
+    public function hasPlayer(UserInterface $player)
+    {
+        return $player === $this->player1 || $player === $this->player2;
+    }
 }

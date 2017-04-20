@@ -2,8 +2,9 @@
 
 namespace AppBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use AppBundle\Entity\Interfaces\RoleHolder;
+use AppBundle\Entity\Interfaces\StorableGame;
+use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Entity\User as BaseUser;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -40,13 +41,41 @@ class User extends BaseUser
     {
         $player = new User();
         $player->addRole(Role::create(Role::PLAYER));
+
         return $player;
+    }
+
+    public function addRole($role)
+    {
+        is_string($role) && ($role = Role::create($role));
+
+        return $this->addToRoleArray($role);
+    }
+
+    private function addToRoleArray(RoleHolder $role)
+    {
+        $roleCode = strtoupper($role->getType());
+        if (!in_array($roleCode, $this->roles, true) &&
+            $this->isValidRole($roleCode)
+        ) {
+            $this->roles[] = $roleCode;
+        }
+
+        return $this;
+    }
+
+    private function isValidRole($roleCode)
+    {
+        return is_string($roleCode) &&
+            in_array($roleCode, Role::getValidRoles()) &&
+            preg_match('/^ROLE\_/', $roleCode) === 1;
     }
 
     public static function createAdmin()
     {
         $user = new User();
         $user->addRole(Role::create(Role::ADMIN));
+
         return $user;
     }
 
@@ -69,27 +98,9 @@ class User extends BaseUser
         return $this;
     }
 
-    public function addRole($role)
+    public function hasRole($role)
     {
-        is_string($role) && ($role = Role::create($role));
-        return $this->addToRoleArray($role);
-    }
-
-    private function addToRoleArray(RoleHolder $role)
-    {
-        $roleCode = strtoupper($role->getType());
-        if (!in_array($roleCode, $this->roles, true) &&
-            $this->isValidRole($roleCode)) {
-            $this->roles[] = $roleCode;
-        }
-
-        return $this;
-    }
-
-    private function isValidRole($roleCode) {
-        return is_string($roleCode) &&
-            in_array($roleCode, Role::getValidRoles()) &&
-            preg_match('/^ROLE\_/', $roleCode) === 1;
+        return in_array($role, $this->getRoles());
     }
 
     /**
@@ -103,6 +114,7 @@ class User extends BaseUser
         foreach ($this->getGroups() as $group) {
             $roles = array_merge($roles, $group->getRoles());
         }
+
         return array_unique($roles);
     }
 }

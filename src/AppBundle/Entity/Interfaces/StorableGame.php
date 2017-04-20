@@ -9,6 +9,7 @@
 namespace AppBundle\Entity\Interfaces;
 
 use AppBundle\Entity\Game;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 
 interface StorableGame
@@ -67,4 +68,15 @@ interface StorableGame
      * @return Game
      */
     public function setWhenPlayed(\DateTime $whenPlayed);
+
+    /**
+     * @return mixed
+     */
+    public function getCreatedBy();
+
+    /**
+     * @param mixed $createdBy
+     * @return Game
+     */
+    public function setCreatedBy(UserInterface $createdBy);
 }
