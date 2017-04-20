@@ -68,8 +68,10 @@ class GameController extends Controller
 
     /**
      * @Security("has_role('ROLE_PLAYER')")
-     * @Route("/games/", name="playerGames")
+     * @Route("/players/games/", name="playerGames")
+     * @Route("/admin/games/", name="adminGames")
      * @Route("/players/{id}/games/", name="specificPlayerGames")
+     * @Route("/admin/players/{id}/games/", name="adminSpecificPlayerGames")
      */
     public function showGamesAction(Request $request, $id = null)
     {
