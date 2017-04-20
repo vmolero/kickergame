@@ -35,18 +35,21 @@ class GameRepository extends EntityRepository
 
     public function findAllGamesByPlayer($playerId)
     {
-        $query = $this->_em->createQuery(
-            'SELECT game FROM AppBundle\Entity\Game game 
-                  JOIN game.local localTeam
-                  JOIN game.visitor visitorTeam
-                  JOIN localTeam.player1 localPlayer1
-                  JOIN visitorTeam.player1 visitorPlayer1
-                  JOIN localTeam.player2 localPlayer2
-                  JOIN visitorTeam.player2 visitorPlayer2
-                  where localPlayer1.id = :id OR visitorPlayer1 = :id
-                        OR localPlayer2.id = :id OR visitorPlayer2 = :id'
-        )->setParameter('id', $playerId);
+        $query = $this->_em->createQueryBuilder();
+        $query->select('game')
+            ->from('AppBundle\Entity\Game', 'game')
+            ->innerJoin('game.local', 'localTeam')
+            ->innerJoin('game.visitor', 'visitorTeam')
+            ->innerJoin('localTeam.player1', 'localPlayer1')
+            ->innerJoin('visitorTeam.player1', 'visitorPlayer1')
+            ->innerJoin('localTeam.player2', 'localPlayer2')
+            ->innerJoin('visitorTeam.player2', 'visitorPlayer2')
+            ->where('localPlayer1.id = :id')
+            ->orWhere('visitorPlayer1 = :id')
+            ->orWhere('localPlayer2.id = :id')
+            ->orWhere('visitorPlayer2 = :id')
+            ->setParameter('id', $playerId);
 
-        return $query->getResult();
+        return $query->getQuery()->getResult();
     }
 }
