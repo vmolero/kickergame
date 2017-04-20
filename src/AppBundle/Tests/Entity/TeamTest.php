@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Tests\Domain;
+namespace AppBundle\Tests\Entity;
 
 use AppBundle\Entity\Team;
 use AppBundle\Entity\User;

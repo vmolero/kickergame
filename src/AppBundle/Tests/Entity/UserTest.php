@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Tests\Domain;
+namespace AppBundle\Tests\Entity;
 
 use AppBundle\Entity\Role;
 use AppBundle\Entity\User;
@@ -49,5 +49,15 @@ class UserTest extends DomainTestCase
         $this->assertFalse($this->invokeMethod($this->user, 'isValidRole', [null]));
         $this->assertFalse($this->invokeMethod($this->user, 'isValidRole', [array('')]));
         $this->assertFalse($this->invokeMethod($this->user, 'isValidRole', [0]));
+    }
+
+    public function testCreateGame()
+    {
+        $this->assertTrue(false);
+    }
+
+    public function testValidateResult()
+    {
+        $this->assertTrue(false);
     }
 }

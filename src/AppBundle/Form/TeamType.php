@@ -15,7 +15,6 @@ class TeamType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $players = $options['players'];
-        $label = $options['label'];
         $builder->add(
             'player1',
             ChoiceType::class,

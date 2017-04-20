@@ -23,7 +23,7 @@ class GameType extends AbstractType
                 TeamType::class,
                 [
                     'players' => $players,
-                    'label' => 'Local player',
+                    'label' => 'Local team',
                 ]
             )
             ->add(
@@ -31,7 +31,7 @@ class GameType extends AbstractType
                 TeamType::class,
                 [
                     'players' => $players,
-                    'label' => 'Visitor player',
+                    'label' => 'Visitor team',
                 ]
             )
             ->add(
@@ -47,8 +47,7 @@ class GameType extends AbstractType
             ->add(
                 'whenPlayed',
                 DateTimeType::class
-            )
-            ->add('save', SubmitType::class, array('label' => 'Create Game'));
+            );
     }
 
     public function getName()
