@@ -15,6 +15,7 @@
                 {% for game in games %}
                     <tr>
                         <td>{{ game.id }}
+                            {# dump(game.confirmedBy.username) #}
                             {% if (game.status == 1) %}
                                 PENDING
                                 {% if (canConfirm[game.id] is defined) %}
