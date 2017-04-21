@@ -34,9 +34,16 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-1 main">
             <h1 class="page-header">Trivago Trial</h1>
             <h2 class="sub-header">{% block header2 %}{% endblock %}</h2>
+            {% for type, messages in app.session.flashBag.all %}
+                {% for message in messages %}
+                    <div class="alert alert-info {{ type }}">
+                        <span class="glyphicon glyphicon-info-sign"></span> {{ message|trans({}, 'UserBundle') }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
             <div class="table-responsive">
                 {% block body %}{% endblock %}
             </div>

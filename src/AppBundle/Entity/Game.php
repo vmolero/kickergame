@@ -7,6 +7,7 @@ use AppBundle\Entity\Interfaces\TeamHolder;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="AppBundle\Repository\GameRepository")
@@ -34,10 +35,12 @@ class Game implements StorableGame
      */
     protected $visitor;
     /**
+     * @Assert\Range(min=0, max=10)
      * @ORM\Column(name="score_local", type="integer", nullable=true)
      */
     protected $scoreLocal;
     /**
+     * @Assert\Range(min=0, max=10)
      * @ORM\Column(name="score_visitor", type="integer", nullable=true)
      */
     protected $scoreVisitor;
@@ -85,44 +88,6 @@ class Game implements StorableGame
     public function setId($id)
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getLocal()
-    {
-        return $this->local;
-    }
-
-    /**
-     * @param mixed $local
-     * @return Game
-     */
-    public function setLocal(TeamHolder $local)
-    {
-        $this->local = $local;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getVisitor()
-    {
-        return $this->visitor;
-    }
-
-    /**
-     * @param mixed $visitor
-     * @return Game
-     */
-    public function setVisitor(TeamHolder $visitor)
-    {
-        $this->visitor = $visitor;
 
         return $this;
     }
@@ -187,20 +152,52 @@ class Game implements StorableGame
     /**
      * @return mixed
      */
-    public function getCreatedBy()
+    public function getStatus()
     {
-        return $this->createdBy;
+        return $this->status;
     }
 
     /**
-     * @param mixed $createdBy
+     * @param mixed $status
      * @return Game
      */
-    public function setCreatedBy(UserInterface $createdBy)
+    public function setStatus($status)
     {
-        $this->createdBy = $createdBy;
+        $this->status = $status;
 
         return $this;
+    }
+
+    public function hasConflicts()
+    {
+        return $this->visitor->hasConflicts() ||
+            $this->local->hasConflicts() ||
+            $this->isThereAPlayerInBothTeams();
+    }
+
+    private function isThereAPlayerInBothTeams()
+    {
+        return $this->local->hasPlayer($this->visitor->getPlayer1()) ||
+            $this->local->hasPlayer($this->visitor->getPlayer2()) ||
+            $this->visitor->hasPlayer($this->local->getPlayer1()) ||
+            $this->visitor->hasPlayer($this->local->getPlayer2());
+    }
+
+    public function canBeConfirmedBy(UserInterface $player)
+    {
+        if ($this->isConfirmed()) {
+            return false;
+        }
+        $can = $player->hasRole(Role::PLAYER);
+        $userWhoCreated = $this->getCreatedBy();
+
+        return $can && $this->getLocal()->hasPlayer($player) && $this->getVisitor()->hasPlayer($userWhoCreated) ||
+            $this->getVisitor()->hasPlayer($player) && $this->getLocal()->hasPlayer($userWhoCreated);
+    }
+
+    public function isConfirmed()
+    {
+        return $this->getConfirmedBy() instanceof UserInterface;
     }
 
     /**
@@ -225,50 +222,58 @@ class Game implements StorableGame
     /**
      * @return mixed
      */
-    public function getStatus()
+    public function getCreatedBy()
     {
-        return $this->status;
+        return $this->createdBy;
     }
 
     /**
-     * @param mixed $status
+     * @param mixed $createdBy
      * @return Game
      */
-    public function setStatus($status)
+    public function setCreatedBy(UserInterface $createdBy)
     {
-        $this->status = $status;
+        $this->createdBy = $createdBy;
 
         return $this;
     }
 
-    public function hasConflicts()
+    /**
+     * @return mixed
+     */
+    public function getLocal()
     {
-        return $this->visitor->hasConflicts() ||
-            $this->local->hasConflicts() ||
-            $this->isThereAPlayerInBothTeams();
+        return $this->local;
     }
 
-    private function isThereAPlayerInBothTeams() {
-        return $this->local->hasPlayer($this->visitor->getPlayer1()) ||
-            $this->local->hasPlayer($this->visitor->getPlayer2()) ||
-            $this->visitor->hasPlayer($this->local->getPlayer1()) ||
-            $this->visitor->hasPlayer($this->local->getPlayer2());
+    /**
+     * @param mixed $local
+     * @return Game
+     */
+    public function setLocal(TeamHolder $local)
+    {
+        $this->local = $local;
+
+        return $this;
     }
 
-    public function canBeConfirmedBy(UserInterface $player)
+    /**
+     * @return mixed
+     */
+    public function getVisitor()
     {
-        if ($this->isConfirmed()) {
-            return false;
-        }
-        $can = $player->hasRole(Role::PLAYER);
-        $userWhoCreated = $this->getCreatedBy();
-        return $can && $this->getLocal()->hasPlayer($player) && $this->getVisitor()->hasPlayer($userWhoCreated) ||
-         $this->getVisitor()->hasPlayer($player) && $this->getLocal()->hasPlayer($userWhoCreated);
+        return $this->visitor;
     }
 
-    private function isConfirmed()
+    /**
+     * @param mixed $visitor
+     * @return Game
+     */
+    public function setVisitor(TeamHolder $visitor)
     {
-        return $this->getConfirmedBy() instanceof UserInterface;
+        $this->visitor = $visitor;
+
+        return $this;
     }
 
     /**
