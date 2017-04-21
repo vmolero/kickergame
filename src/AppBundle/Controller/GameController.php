@@ -111,7 +111,37 @@ class GameController extends Controller
         /** @var Game $game */
         $game = $this->getDoctrine()
             ->getRepository('AppBundle:Game')->find($id);
-        $game->setConfirmedBy($user);
+        if ($game->isConfirmed()) {
+            $this->get('session')->getFlashBag()->set('confirmation.already', 'Game already confirmed');
+            return new RedirectResponse(urldecode($from));
+        }
+        $game->setConfirmedBy($user)->setStatus(Game::CLOSED);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($game);
+        $em->flush();
+
+        return new RedirectResponse(urldecode($from));
+    }
+
+    /**
+     * @Security("has_role('ROLE_ADMIN') or has_role('ROLE_PLAYER')")
+     * @Route("/game/{id}/score/edit", name="editGameScore")
+     * @param Request $request
+     * @param integer $id
+     * @return ResponseRedirect
+     */
+    public function editGameScoreAction(Request $request, $id)
+    {
+        $user = $this->container->get('security.context')->getToken()->getUser();
+        $from = $request->query->get('from');
+        /** @var Game $game */
+        $game = $this->getDoctrine()
+            ->getRepository('AppBundle:Game')->find($id);
+        if ($game->isConfirmed()) {
+            $this->get('session')->getFlashBag()->set('confirmation.already', 'Game already confirmed');
+            return new RedirectResponse(urldecode($from));
+        }
+        $game->setConfirmedBy($user)->setStatus(Game::CLOSED);
         $em = $this->getDoctrine()->getManager();
         $em->persist($game);
         $em->flush();
