@@ -11,18 +11,17 @@
                 <th>Id</th><th>Local</th><th>Visitor</th><th>Date</th><th>Score</th><th>Blame</th>
                 </thead>
                 <tbody>
-                {% dump(canConfirm) %}
                 {% for game in games %}
                     <tr>
                         <td>{{ game.id }}
-                            {# dump(game.confirmedBy.username) #}
-                            {% if (game.status == 1) %}
-                                PENDING
+                            {% if (game.confirmedBy is not null) %}
+                                CLOSED by {{ game.confirmedBy.username  }}
+                            {%  else %}
                                 {% if (canConfirm[game.id] is defined) %}
                                     <a href="{{ baseUrl }}/game/{{ game.id }}/score/confirm?from={{ referrer|url_encode }}">Confirm score</a>
-                                    {% endif %}
-                            {%  else %}
-                                CLOSED
+                                {%  else %}
+                                    PENDING
+                                {% endif %}
                             {%  endif %}
                         </td>
                         <td>{{ game.local.name }}</td>
