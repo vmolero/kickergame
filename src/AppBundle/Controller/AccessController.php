@@ -15,11 +15,40 @@ class AccessController extends Controller
      */
     public function indexAction(Request $request)
     {
-        $path = '/login';
-        $this->get('security.authorization_checker')->isGranted('ROLE_PLAYER') && ($path = '/players');
-        $this->get('security.authorization_checker')->isGranted('ROLE_ADMIN') && ($path = '/admin');
+        $r = $this->redirect($request->getBaseUrl().'/dashboard/');
+        !$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') &&
+        ($r = $this->redirect($request->getBaseUrl().'/login'));
 
-        return new RedirectResponse($request->getBaseUrl().$path);
+        return $r;
+    }
+
+    /**
+     * @Route("/dashboard", name="dashboard")
+     */
+    public function dashboardAction(Request $request)
+    {
+        $handler = $this->get('app.role_handler');
+        $render = $handler->getRender();
+        var_dump($render);
+        die;
+    }
+
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    private function adminAction(Request $request)
+    {
+        return $this->render(
+            'admin/index.html.twig',
+            [
+                'baseUrl' => $request->getBaseUrl(),
+                'registerUrl' => '/register',
+                'playersUrl' => '/admin/players',
+                'teamsUrl' => '/admin/teams',
+                'gamesUrl' => '/admin/games',
+            ]
+        );
     }
 
 }

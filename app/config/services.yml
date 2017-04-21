@@ -20,3 +20,8 @@ services:
         arguments: ["@fos_user.registration.form", "@request", "@fos_user.user_manager", "@fos_user.mailer", "@fos_user.util.token_generator"]
         scope: request
         public: false
+    app.role_handler_factory:
+        class: AppBundle\RoleHandler\RoleHandlerFactory
+    app.role_handler:
+        class: AppBundle\RoleHandler\AdminHandler
+        factory: 'app.role_handler_factory:create'
