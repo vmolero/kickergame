@@ -17,6 +17,7 @@ class Game implements StorableGame
 {
     const OPEN = 1;
     const CLOSED = 0;
+    const REPOSITORY = 'AppBundle:Game';
 
     /**
      * @ORM\Id

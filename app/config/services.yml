@@ -25,3 +25,4 @@ services:
     app.role_handler:
         class: AppBundle\RoleHandler\AdminHandler
         factory: 'app.role_handler_factory:create'
+        arguments: ['@security.authorization_checker', '@templating', '@session', '@translator']

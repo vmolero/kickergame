@@ -3,13 +3,11 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Game;
-use AppBundle\Entity\Role;
-use AppBundle\Form\GameType;
+use AppBundle\Entity\Team;
+use AppBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -19,80 +17,44 @@ class GameController extends Controller
 {
     /**
      * @Security("has_role('ROLE_ADMIN') or has_role('ROLE_PLAYER')")
-     * @Route("/admin/games/new/", name="newGameByAdmin")
-     * @Route("/players/games/new/", name="newGameByPlayer")
+     * @Route("/games/new/", name="newGame")
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showFormNewGameAction(Request $request)
     {
-        $user = $this->container->get('security.context')->getToken()->getUser();
-        $form = $this->createForm(
-            GameType::class,
-            new Game(),
-            [
-                'players' => $this->getDoctrine()
-                    ->getRepository('AppBundle:User')->findByRole(Role::PLAYER),
-            ]
-        )->add('save', SubmitType::class, array('label' => 'Create Game'));
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            /** @var Game $game */
-            $game = $form->getData();
-            $game->setCreatedBy($user);
-            if ($game->hasConflicts()) {
-                $this->get('session')->getFlashBag()->set('registrationMessage', 'Game has team conflicts');
-            }
-            else if ($user->hasRole(Role::PLAYER) && !$game->hasPlayer($user)) {
-                $this->get('session')->getFlashBag()->set('registrationMessage', 'You must be part of the game');
-            } else {
-                $this->getDoctrine()->getRepository('AppBundle:Team')->useExistingTeamsFor($game);
-                $game->setStatus(Game::OPEN);
-                $em->persist($game);
-                $em->flush();
-                $this->get('session')->getFlashBag()->set('registrationMessage', 'Game saved');
-            }
-        }
+        $handler = $this->get('app.role_handler');
 
-        return $this->render(
-            'games/new.html.twig',
-            array(
-                'form' => $form->createView(),
-                'baseUrl' => $request->getBaseUrl(),
-                'roleUrl' => in_array(ROle::ADMIN, $user->getRoles()) ? 'admin' : 'players',
-            )
+        return $handler->handle(
+            'newGame',
+            $request,
+            [
+                'user' => $this->container->get('security.context')->getToken()->getUser(),
+                'userRepository' => $this->getDoctrine()->getRepository(User::REPOSITORY),
+                'teamRepository' => $this->getDoctrine()->getRepository(Team::REPOSITORY),
+                'gameRepository' => $this->getDoctrine()->getRepository(Game::REPOSITORY),
+                'formFactory' => $this->get('form.factory'),
+            ]
         );
     }
 
     /**
      * @Security("has_role('ROLE_PLAYER')")
-     * @Route("/players/games/", name="playerGames")
-     * @Route("/admin/games/", name="adminGames")
+     * @Route("/games/", name="games")
      * @Route("/players/{id}/games/", name="specificPlayerGames")
-     * @Route("/admin/players/{id}/games/", name="adminSpecificPlayerGames")
      */
-    public function showGamesAction(Request $request, $id = null)
+    public function showGamesAction(Request $request, $player_id = null)
     {
-        $user = $this->container->get('security.context')->getToken()->getUser();
-        $role = in_array(Role::ADMIN, $user->getRoles()) ? 'admin' : 'players';
-        $gameRepo = $this->getDoctrine()
-            ->getRepository('AppBundle:Game');
-        $games = $id ? $gameRepo->findAllGamesByPlayer($id) : $gameRepo->findAll();
-        $canConfirm = [];
-        foreach ($games as $aGame) {
-            $aGame->canBeConfirmedBy($user) && ($canConfirm[$aGame->getId()] = 1);
-        }
+        $handler = $this->get('app.role_handler');
 
-        return $this->render(
-            'games/'.$role.'.html.twig',
+        return $handler->handle(
+            'games',
+            $request,
             [
-                'baseUrl' => $request->getBaseUrl(),
-                'roleUrl' => $role,
-                'games' => $games,
-                'referrer' => $request->getRequestUri(),
-                'canConfirm' => $canConfirm,
+                'id' => $player_id,
+                'user' => $this->container->get('security.context')->getToken()->getUser(),
+                'gameRepository' => $gameRepo = $this->getDoctrine()->getRepository(Game::REPOSITORY),
             ]
         );
     }
@@ -106,21 +68,18 @@ class GameController extends Controller
      */
     public function confirmGameAction(Request $request, $id)
     {
-        $user = $this->container->get('security.context')->getToken()->getUser();
-        $from = $request->query->get('from');
-        /** @var Game $game */
-        $game = $this->getDoctrine()
-            ->getRepository('AppBundle:Game')->find($id);
-        if ($game->isConfirmed()) {
-            $this->get('session')->getFlashBag()->set('confirmation.already', 'Game already confirmed');
-            return new RedirectResponse(urldecode($from));
-        }
-        $game->setConfirmedBy($user)->setStatus(Game::CLOSED);
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($game);
-        $em->flush();
+        $handler = $this->get('app.role_handler');
 
-        return new RedirectResponse(urldecode($from));
+        return $handler->handle(
+            'confirmGame',
+            $request,
+            [
+                'id' => $id,
+                'from' => $request->query->get('from'),
+                'user' => $this->container->get('security.context')->getToken()->getUser(),
+                'gameRepository' => $gameRepo = $this->getDoctrine()->getRepository(Game::REPOSITORY),
+            ]
+        );
     }
 
     /**
@@ -132,20 +91,6 @@ class GameController extends Controller
      */
     public function editGameScoreAction(Request $request, $id)
     {
-        $user = $this->container->get('security.context')->getToken()->getUser();
-        $from = $request->query->get('from');
-        /** @var Game $game */
-        $game = $this->getDoctrine()
-            ->getRepository('AppBundle:Game')->find($id);
-        if ($game->isConfirmed()) {
-            $this->get('session')->getFlashBag()->set('confirmation.already', 'Game already confirmed');
-            return new RedirectResponse(urldecode($from));
-        }
-        $game->setConfirmedBy($user)->setStatus(Game::CLOSED);
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($game);
-        $em->flush();
 
-        return new RedirectResponse(urldecode($from));
     }
 }
