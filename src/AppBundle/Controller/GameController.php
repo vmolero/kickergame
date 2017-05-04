@@ -54,7 +54,7 @@ class GameController extends Controller
             [
                 'id' => $player_id,
                 'user' => $this->container->get('security.context')->getToken()->getUser(),
-                'gameRepository' => $gameRepo = $this->getDoctrine()->getRepository(Game::REPOSITORY),
+                'gameRepository' => $this->getDoctrine()->getRepository(Game::REPOSITORY),
             ]
         );
     }
@@ -77,7 +77,7 @@ class GameController extends Controller
                 'id' => $id,
                 'from' => $request->query->get('from'),
                 'user' => $this->container->get('security.context')->getToken()->getUser(),
-                'gameRepository' => $gameRepo = $this->getDoctrine()->getRepository(Game::REPOSITORY),
+                'gameRepository' => $this->getDoctrine()->getRepository(Game::REPOSITORY),
             ]
         );
     }

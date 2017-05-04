@@ -24,7 +24,7 @@ class AdminHandler extends RoleHandler
             'admin/index.html.twig',
             [
                 'baseUrl' => $request->getBaseUrl(),
-                'registerUrl' => '/players/new',
+                'registerUrl' => '/register',
                 'playersUrl' => '/players',
                 'teamsUrl' => '/teams',
                 'gamesUrl' => '/games',
@@ -49,11 +49,6 @@ class AdminHandler extends RoleHandler
                 'players' => $players,
             ]
         );
-    }
-
-    private function invalidPlayersAction(array $data)
-    {
-        return !(array_key_exists('userRepository', $data));
     }
 
     public function newPlayerAction(Request $request, array $data = [])
@@ -108,19 +103,11 @@ class AdminHandler extends RoleHandler
             'games/admin.html.twig',
             [
                 'baseUrl' => $request->getBaseUrl(),
-                'roleUrl' => 'admin',
                 'games' => $games,
                 'referrer' => $request->getRequestUri(),
                 'canConfirm' => $canConfirm,
             ]
         );
-    }
-
-    private function invalidGamesAction(array $data)
-    {
-        return !(array_key_exists('id', $data) &&
-            array_key_exists('gameRepository', $data) &&
-            array_key_exists('user', $data));
     }
 
     public function confirmGameAction(Request $request, array $data = [])
@@ -140,12 +127,6 @@ class AdminHandler extends RoleHandler
         }
 
         return new RedirectResponse(urldecode($data['from']));
-    }
-
-    private function invalidConfirmGameAction(array $data)
-    {
-        return $this->invalidGamesAction($data) ||
-            !array_key_exists('from', $data);
     }
 
     public function newGameAction(Request $request, array $data = [])
@@ -199,15 +180,5 @@ class AdminHandler extends RoleHandler
                 'baseUrl' => $request->getBaseUrl(),
             )
         );
-    }
-
-    private function invalidNewGameAction(array $data)
-    {
-        return
-            !(array_key_exists('userRepository', $data) &&
-                array_key_exists('teamRepository', $data) &&
-                array_key_exists('gameRepository', $data) &&
-                array_key_exists('user', $data) &&
-                array_key_exists('formFactory', $data));
     }
 }

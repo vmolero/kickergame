@@ -8,7 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
-class KickerController extends Controller
+class AccessController extends Controller
 {
     /**
      * @Route("/", name="home")
@@ -32,7 +32,4 @@ class KickerController extends Controller
 
         return $handler->handle('dashboard', $request);
     }
-
-
-
 }

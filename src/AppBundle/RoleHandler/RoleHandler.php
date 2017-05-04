@@ -78,4 +78,32 @@ abstract class RoleHandler
             'You can not use the "render" method if the Templating Engine is not available.'
         );
     }
+    
+    protected function invalidPlayersAction(array $data)
+    {
+        return !(array_key_exists('userRepository', $data));
+    }
+    
+    protected function invalidGamesAction(array $data)
+    {
+        return !(array_key_exists('id', $data) &&
+            array_key_exists('gameRepository', $data) &&
+            array_key_exists('user', $data));
+    }
+    
+    protected function invalidConfirmGameAction(array $data)
+    {
+        return $this->invalidGamesAction($data) ||
+            !array_key_exists('from', $data);
+    }
+    
+    protected function invalidNewGameAction(array $data)
+    {
+        return
+            !(array_key_exists('userRepository', $data) &&
+                array_key_exists('teamRepository', $data) &&
+                array_key_exists('gameRepository', $data) &&
+                array_key_exists('user', $data) &&
+                array_key_exists('formFactory', $data));
+    }
 }
