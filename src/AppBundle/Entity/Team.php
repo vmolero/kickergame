@@ -15,6 +15,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class Team implements TeamHolder
 {
+    const REPOSITORY = 'AppBundle:Team';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")

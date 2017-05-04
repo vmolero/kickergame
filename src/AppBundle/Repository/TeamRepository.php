@@ -20,16 +20,22 @@ class TeamRepository extends EntityRepository
      * @return Game
      */
     public function useExistingTeamsFor(Game &$game) {
-        $localTeam = $this->fetchTeamsIfExist(
-            $game->getLocal()->getPlayer1(),
-            $game->getLocal()->getPlayer2()
-        );
-        $visitorTeam = $this->fetchTeamsIfExist(
-            $game->getVisitor()->getPlayer1(),
-            $game->getVisitor()->getPlayer2()
-        );
-        $localTeam instanceof TeamHolder && $game->setLocal($localTeam);
-        $visitorTeam instanceof TeamHolder && $game->setVisitor($visitorTeam);
+        $game->setLocal($this->getExistingTeam($game->getLocal()));
+        $game->setVisitor($this->getExistingTeam($game->getVisitor()));
         return $game;
+    }
+
+    /**
+     * @param TeamHolder $team
+     * @return TeamHolder|null|object
+     */
+    public function getExistingTeam(TeamHolder $team) {
+        $aTeam = $this->fetchTeamsIfExist(
+            $team->getPlayer1(),
+            $team->getPlayer2()
+        );
+
+        $aTeam instanceof TeamHolder && ($team = $aTeam);
+        return $team;
     }
 }

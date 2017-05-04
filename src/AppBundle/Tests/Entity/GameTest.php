@@ -21,10 +21,11 @@ class GameTest extends DomainTestCase
     {
         $local = new Team();
         $visitor = new Team();
-        $local->setPlayer1(User::createPlayer()->setUsername('local1'));
+        $user1 = User::createPlayer()->setUsername('local1');
+        $local->setPlayer1($user1);
         $local->setPlayer2(User::createPlayer()->setUsername('local2'));
         $visitor->setPlayer1(User::createPlayer()->setUsername('visitor1'));
-        $visitor->setPlayer2(User::createPlayer()->setUsername('local1'));
+        $visitor->setPlayer2($user1);
         $this->game->setLocal($local);
         $this->game->setVisitor($visitor);
         $this->assertTrue($this->game->hasConflicts());

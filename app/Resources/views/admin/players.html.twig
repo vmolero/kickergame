@@ -11,14 +11,14 @@
                 </thead>
                 <tbody>
                 {% for player in players %}
-                    <tr><td>{{ player.id }} <a href="/player/{{ player.id }}/delete">Delete</a></td>
+                    <tr><td>{{ player.id }} <a href="{{ baseUrl }}/players/{{ player.id }}/delete">Delete</a> | <a href="{{ baseUrl }}/players/{{ player.id }}/edit">Edit</a></td>
                         <td>{{ player.username }}</td>
                         <td>{{ player.fullName }}</td><td><a href="mailto:{{ player.email }}">{{ player.email }}</a></td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
-            <p><a href="{{ baseUrl }}/admin">Back to menu</a></p>
+            <p><a href="{{ baseUrl }}/dashboard">Back to menu</a></p>
         </div>
     </div>
 {% endblock %}

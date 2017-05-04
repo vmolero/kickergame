@@ -18,4 +18,5 @@ app/logs
 app/cache
 bower_components
 vendor
-
+/nbproject
+/nbproject/private/

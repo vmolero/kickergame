@@ -4,7 +4,7 @@
     <div id="wrapper">
         <div id="container">
             <h2>Player list</h2>
-            <p><a href="{{ baseUrl }}/{{ roleUrl }}/games/new">New game</a></p>
+            <p><a href="{{ baseUrl }}/games/new">New game</a></p>
             <table class="table">
                 <thead>
                 <th>Id</th><th>Local</th><th>Visitor</th><th>Date</th><th>Score</th><th>Blame</th><th>Status</th>
@@ -34,7 +34,7 @@
                 {% endfor %}
                 </tbody>
             </table>
-            <p><a href="{{ baseUrl }}/{{ roleUrl }}">Back to menu</a></p>
+            <p><a href="{{ baseUrl }}/dashboard">Back to menu</a></p>
         </div>
     </div>
 {% endblock %}
