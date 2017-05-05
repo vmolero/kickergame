@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class GameController extends KickerController
 {
+    const GAME_ROUTE_NAME = 'game';
     /**
      * @CFG\Security("has_role('ROLE_ADMIN') or has_role('ROLE_PLAYER')")
      * @CFG\Route("/games/new/", name="newGame")
@@ -25,18 +26,18 @@ class GameController extends KickerController
     {
         /* @var $handler RoleHandler  */
         $handler = $this->get('app.role_handler');
-        $data = $handler->handle(
+        $handler->handle(
             'newGame',
             $request,
             [
-                'user' => $this->container->get('security.context')->getToken()->getUser(),
+                'user' => $this->container->get('security.token_storage')->getToken()->getUser(),
                 'userRepository' => $this->getDoctrine()->getRepository(User::REPOSITORY),
                 'teamRepository' => $this->getDoctrine()->getRepository(Team::REPOSITORY),
                 'gameRepository' => $this->getDoctrine()->getRepository(Game::REPOSITORY),
                 'formFactory' => $this->get('form.factory'),
             ]
         );
-        return $this->buildResponse($data);
+        return $this->buildResponse($handler);
     }
 
     /**
@@ -53,7 +54,7 @@ class GameController extends KickerController
             $request,
             [
                 'id' => $player_id,
-                'user' => $this->container->get('security.context')->getToken()->getUser(),
+                'user' => $this->container->get('security.token_storage')->getToken()->getUser(),
                 'gameRepository' => $this->getDoctrine()->getRepository(Game::REPOSITORY),
             ]
         );
@@ -71,14 +72,13 @@ class GameController extends KickerController
     {
         /* @var $handler RoleHandler  */
         $handler = $this->get('app.role_handler');
-        $data = $handler->handle('confirmGame',
+        $handler->handle('confirmGame',
             $request,
             [
                 'id' => $id,
-                'from' => $request->query->get('from'),
-                'user' => $this->container->get('security.context')->getToken()->getUser(),
+                'user' => $this->container->get('security.token_storage')->getToken()->getUser(),
                 'gameRepository' => $this->getDoctrine()->getRepository(Game::REPOSITORY),
             ]);
-        return $this->buildRedirect($data);
+        return $this->redirectToRoute('games');
     }
 }

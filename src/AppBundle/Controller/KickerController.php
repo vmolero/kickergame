@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\RoleHandler\RoleHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -11,13 +12,13 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  */
 abstract class KickerController extends Controller
 {
-    public function buildResponse(array $handlerResult)
+    public function buildResponse(RoleHandler $handler)
     {
-        isset($handlerResult['messages']) && $this->fillFlashBag($handlerResult['messages']);
+        $this->fillFlashBag($handler->getMessages());
 
         return $this->render(
-            $handlerResult['template'],
-            $handlerResult['parameters']
+            $handler->getTemplate(),
+            $handler->getParameters()
         );
     }
 
@@ -28,10 +29,10 @@ abstract class KickerController extends Controller
         }
     }
 
-    public function buildRedirect(array $handlerResult)
+    public function buildRedirect(RoleHandler $handler)
     {
-        isset($handlerResult['messages']) && $this->fillFlashBag($handlerResult['messages']);
+        $this->fillFlashBag($handler->getMessages());
 
-        return $this->redirect(urldecode($handlerResult['url']));
+        return $this->redirectToRoute($handler->getRedirectTo());
     }
 }

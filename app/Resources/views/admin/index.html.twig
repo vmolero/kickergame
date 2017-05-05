@@ -4,10 +4,10 @@
     <div id="wrapper">
         <div id="container">
             <ul>
-                <li><a href="{{ baseUrl ~ registerUrl }}">Register a new player</a></li>
-                <li><a href="{{ baseUrl ~ playersUrl }}">See all players</a></li>
-                <!-- <li><a href="{{ baseUrl ~ teamsUrl }}">Manage teams</a></li> -->
-                <li><a href="{{ baseUrl ~ gamesUrl }}">Manage games</a></li>
+                <li><a href="{{ app.request.baseUrl ~ registerUrl }}">Register a new player</a></li>
+                <li><a href="{{ app.request.baseUrl ~ playersUrl }}">See all players</a></li>
+                <!-- <li><a href="{{ app.request.baseUrl ~ teamsUrl }}">Manage teams</a></li> -->
+                <li><a href="{{ app.request.baseUrl ~ gamesUrl }}">Manage games</a></li>
             </ul>
         </div>
     </div>

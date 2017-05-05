@@ -15,6 +15,10 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class AdminHandler extends RoleHandler
 {
+    const DASHBOARD = 'admin/index.html.twig';
+    const PLAYERS = 'admin/players.html.twig';
+    const GAMES = 'games/admin.html.twig';
+
     /**
      * @param Request $request
      * @param array $data
@@ -22,14 +26,13 @@ class AdminHandler extends RoleHandler
      */
     public function dashboardAction(Request $request, array $data = [])
     {
-        return $this->getResult(
-            'admin/index.html.twig',
+        return $this->setResult(
+            self::DASHBOARD,
             [
-                'baseUrl' => $request->getBaseUrl(),
-                'registerUrl' => '/register',
-                'playersUrl' => '/players',
-                'teamsUrl' => '/teams',
-                'gamesUrl' => '/games',
+                'registerUrl' => RoleHandler::REGISTER_URL,
+                'playersUrl' => RoleHandler::PLAYERS_URL,
+                'teamsUrl' => RoleHandler::TEAMS_URL,
+                'gamesUrl' => RoleHandler::GAMES_URL,
             ]
         );
     }
@@ -48,11 +51,11 @@ class AdminHandler extends RoleHandler
         $userRepository = $data['userRepository'];
         $players = $userRepository->findByRole(Role::PLAYER);
 
-        return $this->getResult(
-            'admin/players.html.twig',
+        return $this->setResult(
+            self::PLAYERS,
             [
-                'baseUrl' => $request->getBaseUrl(),
-                'registerUrl' => '/register',
+                'dashboardUrl' => RoleHandler::DASHBOARD_URL,
+                'registerUrl' => RoleHandler::REGISTER_URL,
                 'players' => $players,
             ]
         );
@@ -76,12 +79,11 @@ class AdminHandler extends RoleHandler
             $aGame->canBeConfirmedBy($data['user']) && ($canConfirm[$aGame->getId()] = 1);
         }
 
-        return $this->getResult(
-            'games/admin.html.twig',
+        return $this->setResult(
+            self::GAMES,
             [
-                'baseUrl' => $request->getBaseUrl(),
                 'games' => $games,
-                'referrer' => $request->getRequestUri(),
+                'referrer' => $data['referrer'],
                 'canConfirm' => $canConfirm,
             ]
         );
@@ -90,7 +92,7 @@ class AdminHandler extends RoleHandler
     /**
      * @param Request $request
      * @param array $data
-     * @return array
+     * @return boolean
      */
     public function confirmGameAction(Request $request, array $data = [])
     {
@@ -101,14 +103,15 @@ class AdminHandler extends RoleHandler
         $gameRepo = $data['gameRepository'];
         /** @var Game $game */
         $game = $gameRepo->find($data['id']);
-        $messages = [];
+        $messages = ['confirmation.action' => 'Game confirmed and closed'];
         if ($game->isConfirmed()) {
-            $messages['confirmation.already'] = 'Game already confirmed';
-        } else {
-            $game->setConfirmedBy($data['user'])->setStatus(Game::CLOSED);
-            $gameRepo->save($game);
-        }
+            $messages['confirmation.action'] = 'Game already confirmed';
 
-        return $this->getRedirect($data['from']);
+            return $this->setRedirect('games', $messages);
+        }
+        $game->setConfirmedBy($data['user'])->setStatus(Game::CLOSED);
+        $gameRepo->save($game);
+
+        return $this->setRedirect('games', $messages);
     }
 }

@@ -15,6 +15,95 @@ use Symfony\Component\HttpFoundation\Request;
 
 abstract class RoleHandler
 {
+    const DASHBOARD_URL = '/dashboard';
+    const PLAYERS_URL = '/players';
+    const GAMES_URL = '/games';
+    const TEAMS_URL = '/teams';
+    const REGISTER_URL = '/register';
+
+    private $template;
+    private $parameters = [];
+    private $redirectTo;
+    private $messages = [];
+
+    /**
+     * @return array
+     */
+    public function getMessages()
+    {
+        return $this->messages;
+    }
+
+    /**
+     * @param array $messages
+     * @return RoleHandler
+     */
+    protected function setMessages($messages)
+    {
+        $this->messages = $messages;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTemplate()
+    {
+        return $this->template;
+    }
+
+    /**
+     * @param mixed $template
+     * @return RoleHandler
+     */
+    protected function setTemplate($template)
+    {
+        $this->template = $template;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRedirectTo()
+    {
+        return $this->redirectTo;
+    }
+
+    /**
+     * @param mixed $redirectTo
+     * @return RoleHandler
+     */
+    protected function setRedirectTo($redirectTo)
+    {
+        $this->redirectTo = $redirectTo;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @param array $parameters
+     * @return RoleHandler
+     */
+    protected function setParameters($parameters)
+    {
+        $this->parameters = $parameters;
+
+        return $this;
+    }
+
+
+
     /**
      * @param $name
      * @param Request $request
@@ -37,27 +126,27 @@ abstract class RoleHandler
      * @param array $messages
      * @return array
      */
-    protected function getResult($view, array $parameters = [], array $messages = [])
+    protected function setResult($view, array $parameters = [], array $messages = [])
     {
-        return [
-            'template' => $view,
-            'parameters' => $parameters,
-            'messages' => $messages
-        ];
+        $this->setTemplate($view);
+        $this->setParameters($parameters);
+        $this->setMessages($messages);
+        return $this;
     }
 
     /**
-     * @param $url
+     * @param $routeName
+     * @param array $messages
      * @return array
      */
-    protected function getRedirect($url, array $messages = [])
+    protected function setRedirect($routeName, array $messages = [])
     {
-        return [
-            'url' => $url,
-            'messages' => $messages
-        ];
+        $this->setRedirectTo($routeName);
+        $this->setMessages($messages);
+
+        return $this;
     }
-   
+
     /**
      * 
      * @param Request $request
@@ -111,7 +200,7 @@ abstract class RoleHandler
             }
         }
 
-        return $this->getResult('games/new.html.twig',
+        return $this->setResult('games/new.html.twig',
             [
                 'form' => $form->createView(),
                 'baseUrl' => $request->getBaseUrl(),

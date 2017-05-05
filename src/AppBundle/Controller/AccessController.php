@@ -18,9 +18,9 @@ class AccessController extends KickerController
     public function indexAction(Request $request)
     {
         if ($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
-            return $this->redirect($request->getBaseUrl().'/dashboard/');
+            return $this->redirectToRoute('dashboard');
         }
-        return $this->redirect($request->getBaseUrl().'/login');
+        return $this->redirectToRoute('fos_user_security_login');
     }
 
     /**
