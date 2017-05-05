@@ -3,51 +3,29 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\User;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration as CFG;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class PlayerController
  * @package AppBundle\Controller
  */
-class PlayerController extends Controller
+class PlayerController extends KickerController
 {
     /**
-     * @Security("has_role('ROLE_PLAYER')")
-     * @Route("/players/", name="players")
+     * @CFG\Security("has_role('ROLE_PLAYER')")
+     * @CFG\Route("/players/", name="players")
      */
     public function playersAction(Request $request)
     {
+        /* @var $handler RoleHandler  */
         $handler = $this->get('app.role_handler');
-
-        return $handler->handle(
-            'players',
+        $data = $handler->handle('players',
             $request,
             [
                 'userRepository' => $this->getDoctrine()
                     ->getRepository(User::REPOSITORY),
-            ]
-        );
+            ]);
+        return $this->buildResponse($data);
     }
-
-    /**
-     * @Security("has_role('ROLE_ADMIN')")
-     * @Route("/players/new/", name="newPlayers")
-
-    public function newPlayerAction(Request $request)
-    {
-        $handler = $this->get('app.role_handler');
-
-        return $handler->handle(
-            'newPlayer',
-            $request,
-            [
-                'formFactory' => $this->get('form.factory'),
-                'translator' => $this->get('translator'),
-                // 'formHandler' => $this->container->get('fos_user.registration.form.handler'),
-            ]
-        );
-    }*/
 }

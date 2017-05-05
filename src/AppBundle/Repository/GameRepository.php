@@ -3,7 +3,6 @@
 namespace AppBundle\Repository;
 
 use AppBundle\Entity\Game;
-use AppBundle\Entity\Team;
 use Doctrine\ORM\EntityRepository;
 
 class GameRepository extends EntityRepository
