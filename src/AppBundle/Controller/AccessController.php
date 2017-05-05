@@ -2,34 +2,36 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\User;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use AppBundle\RoleHandler\RoleHandler;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration as CFG;
 use Symfony\Component\HttpFoundation\Request;
 
-class AccessController extends Controller
+/**
+ * Class AccessController
+ * @package AppBundle\Controller
+ */
+class AccessController extends KickerController
 {
     /**
-     * @Route("/", name="home")
+     * @CFG\Route("/", name="home")
      */
     public function indexAction(Request $request)
     {
-        $r = $this->redirect($request->getBaseUrl().'/dashboard/');
-        !$this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY') &&
-        ($r = $this->redirect($request->getBaseUrl().'/login'));
-
-        return $r;
+        if ($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
+            return $this->redirect($request->getBaseUrl().'/dashboard/');
+        }
+        return $this->redirect($request->getBaseUrl().'/login');
     }
 
     /**
-     * @Security("has_role('ROLE_PLAYER')")
-     * @Route("/dashboard/", name="dashboard")
+     * @CFG\Security("has_role('ROLE_PLAYER')")
+     * @CFG\Route("/dashboard/", name="dashboard")
      */
     public function dashboardAction(Request $request)
     {
+        /* @var $handler RoleHandler  */
         $handler = $this->get('app.role_handler');
-
-        return $handler->handle('dashboard', $request);
+        $data = $handler->handle('dashboard', $request);
+        return $this->buildResponse($data);
     }
 }

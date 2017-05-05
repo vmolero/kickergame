@@ -18,7 +18,7 @@ class PlayerHandler extends RoleHandler
 {
     public function dashboardAction(Request $request, array $data = [])
     {
-        return $this->render(
+        return $this->getResult(
             'players/index.html.twig',
             [
                 'url' => $request->getBaseUrl().'/games',
@@ -28,7 +28,7 @@ class PlayerHandler extends RoleHandler
 
     public function playersAction(Request $request, array $data = [])
     {
-        return $this->render(
+        return $this->getResult(
             'players/index.html.twig',
             [
                 'url' => $request->getBaseUrl().'/games',
@@ -49,7 +49,7 @@ class PlayerHandler extends RoleHandler
             $aGame->canBeConfirmedBy($data['user']) && ($canConfirm[$aGame->getId()] = 1);
         }
 
-        return $this->render(
+        return $this->getResult(
             'games/players.html.twig',
             [
                 'baseUrl' => $request->getBaseUrl(),
@@ -65,75 +65,20 @@ class PlayerHandler extends RoleHandler
         if ($this->invalidConfirmGameAction($data)) {
             throw new \LogicException('Missing data keys');
         }
-        /** @var GameRepository $gameRepo */
+        /* @var $gameRepo GameRepository */
         $gameRepo = $data['gameRepository'];
         /* @var $game Game */
-        /** @var Game $game */
         $game = $gameRepo->find($data['id']);
+        $messages = [];
         if ($game->isConfirmed()) {
-            $this->getSession()->getFlashBag()->set('confirmation.already', 'Game already confirmed');
+            $messages['confirmation.already'] = 'Game already confirmed';
         } else if (!$game->canBeConfirmedBy($data['user'])) {
-            $this->getSession()->getFlashBag()->set('confirmation.notallowed', 'You\'re not allowed to confirm this game');
+            $messages['confirmation.notallowed'] = 'You\'re not allowed to confirm this game';
         } else {
             $game->setConfirmedBy($data['user'])->setStatus(Game::CLOSED);
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($game);
-            $em->flush();
+            $gameRepo->save($game);
         }
-        return new RedirectResponse(urldecode($data['from']));
-    }
-    
-    public function newGameAction(Request $request, array $data = [])
-    {
-        if ($this->invalidNewGameAction($data)) {
-            throw new LogicException('Missing data keys');
-        }
-        /** @var Game $game */
-        $game = new Game();
-        /** @var User $user */
-        $user = $data['user'];
-        /** @var UserRepository $userRepository */
-        $userRepository = $data['userRepository'];
-        /** @var TeamRepository $teamRepository */
-        $teamRepository = $data['teamRepository'];
-        /** @var GameRepository $gameRepository */
-        $gameRepository = $data['gameRepository'];
-        /** @var FormFactoryInterface $formFactory */
-        $formFactory = $data['formFactory'];
-        /** @var FormInterface $form */
-        $form = $formFactory->create(
-            GameType::class,
-            $game,
-            [
-                'players' => $userRepository->findByRole(Role::PLAYER),
-            ]
-        )->add('save', SubmitType::class, array('label' => 'Create Game'));
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var Game $game */
-            $game = $form->getData();
-            $game->setCreatedBy($user);
-            if ($game->hasConflicts()) {
-                $this->getSession()->getFlashBag()->set('registrationMessage', 'Game has team conflicts');
-            } else {
-                if ($user->hasRole(Role::PLAYER) && !$game->hasPlayer($user)) {
-                    $this->getSession()->getFlashBag()->set('registrationMessage', 'You must be part of the game');
-                } else {
-                    $game = $teamRepository->useExistingTeamsFor($game);
-                    $game->setStatus(Game::OPEN);
-                    $gameRepository->save($game);
-                    $this->getSession()->getFlashBag()->set('registrationMessage', 'Game saved');
-                }
-            }
-        }
-
-        return $this->render(
-            'games/new.html.twig',
-            array(
-                'form' => $form->createView(),
-                'baseUrl' => $request->getBaseUrl(),
-            )
-        );
+        return $this->getRedirect($data['from'], $messages);
     }
 
 }

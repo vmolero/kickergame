@@ -1,7 +1,19 @@
 # Learn more about services, parameters and containers at
 # http://symfony.com/doc/current/service_container.html
 parameters:
-    #parameter_name: value
+    template:
+        dashboard:
+            admin: admin/index.html.twig
+            player: players/index.html.twig
+        players:
+            admin: admin/index.html.twig
+            player: players/index.html.twig
+        games:
+            admin: games/admin.html.twig
+            player: games/players.html.twig
+        newGame: games/new.html.twig
+        newPlayer: UserBundle:Registration:register.html.twig    
+            
 
 services:
     #service_name:
@@ -25,4 +37,4 @@ services:
     app.role_handler:
         class: AppBundle\RoleHandler\AdminHandler
         factory: 'app.role_handler_factory:create'
-        arguments: ['@security.authorization_checker', '@templating', '@session', '@translator']
+        arguments: ['@security.authorization_checker', '@templating', '@session']

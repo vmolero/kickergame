@@ -5,28 +5,27 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Game;
 use AppBundle\Entity\Team;
 use AppBundle\Entity\User;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration as CFG;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- *
+ * Class GameController
+ * @package AppBundle\Controller
  */
-class GameController extends Controller
+class GameController extends KickerController
 {
     /**
-     * @Security("has_role('ROLE_ADMIN') or has_role('ROLE_PLAYER')")
-     * @Route("/games/new/", name="newGame")
+     * @CFG\Security("has_role('ROLE_ADMIN') or has_role('ROLE_PLAYER')")
+     * @CFG\Route("/games/new/", name="newGame")
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showFormNewGameAction(Request $request)
     {
+        /* @var $handler RoleHandler  */
         $handler = $this->get('app.role_handler');
-
-        return $handler->handle(
+        $data = $handler->handle(
             'newGame',
             $request,
             [
@@ -37,18 +36,19 @@ class GameController extends Controller
                 'formFactory' => $this->get('form.factory'),
             ]
         );
+        return $this->buildResponse($data);
     }
 
     /**
-     * @Security("has_role('ROLE_PLAYER')")
-     * @Route("/games/", name="games")
-     * @Route("/players/{id}/games/", name="specificPlayerGames")
+     * @CFG\Security("has_role('ROLE_PLAYER')")
+     * @CFG\Route("/games/", name="games")
+     * @CFG\Route("/players/{id}/games/", name="specificPlayerGames")
      */
     public function showGamesAction(Request $request, $player_id = null)
     {
         $handler = $this->get('app.role_handler');
 
-        return $handler->handle(
+        $data = $handler->handle(
             'games',
             $request,
             [
@@ -57,40 +57,28 @@ class GameController extends Controller
                 'gameRepository' => $this->getDoctrine()->getRepository(Game::REPOSITORY),
             ]
         );
+        return $this->buildResponse($data);
     }
 
     /**
-     * @Security("has_role('ROLE_ADMIN') or has_role('ROLE_PLAYER')")
-     * @Route("/game/{id}/score/confirm", name="confirmGame")
+     * @CFG\Security("has_role('ROLE_ADMIN') or has_role('ROLE_PLAYER')")
+     * @CFG\Route("/game/{id}/score/confirm", name="confirmGame")
      * @param Request $request
      * @param integer $id
      * @return ResponseRedirect
      */
     public function confirmGameAction(Request $request, $id)
     {
+        /* @var $handler RoleHandler  */
         $handler = $this->get('app.role_handler');
-
-        return $handler->handle(
-            'confirmGame',
+        $data = $handler->handle('confirmGame',
             $request,
             [
                 'id' => $id,
                 'from' => $request->query->get('from'),
                 'user' => $this->container->get('security.context')->getToken()->getUser(),
                 'gameRepository' => $this->getDoctrine()->getRepository(Game::REPOSITORY),
-            ]
-        );
-    }
-
-    /**
-     * @Security("has_role('ROLE_ADMIN') or has_role('ROLE_PLAYER')")
-     * @Route("/game/{id}/score/edit", name="editGameScore")
-     * @param Request $request
-     * @param integer $id
-     * @return ResponseRedirect
-     */
-    public function editGameScoreAction(Request $request, $id)
-    {
-
+            ]);
+        return $this->buildRedirect($data);
     }
 }
