@@ -2,6 +2,7 @@
 
 namespace AppBundle\RoleHandler;
 
+use AppBundle\Controller\GameController;
 use AppBundle\Entity\Game;
 use AppBundle\Entity\Role;
 use AppBundle\Repository\GameRepository;
@@ -15,6 +16,10 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class AdminHandler extends RoleHandler
 {
+    const DASHBOARD_TPL = 'admin/index.html.twig';
+    const PLAYERS_TPL = 'admin/players.html.twig';
+    const GAMES_TPL = 'games/admin.html.twig';
+
     /**
      * @param Request $request
      * @param array $data
@@ -22,16 +27,7 @@ class AdminHandler extends RoleHandler
      */
     public function dashboardAction(Request $request, array $data = [])
     {
-        return $this->getResult(
-            'admin/index.html.twig',
-            [
-                'baseUrl' => $request->getBaseUrl(),
-                'registerUrl' => '/register',
-                'playersUrl' => '/players',
-                'teamsUrl' => '/teams',
-                'gamesUrl' => '/games',
-            ]
-        );
+        return $this->setResult(self::DASHBOARD_TPL);
     }
 
     /**
@@ -48,11 +44,11 @@ class AdminHandler extends RoleHandler
         $userRepository = $data['userRepository'];
         $players = $userRepository->findByRole(Role::PLAYER);
 
-        return $this->getResult(
-            'admin/players.html.twig',
+        return $this->setResult(
+            self::PLAYERS_TPL,
             [
-                'baseUrl' => $request->getBaseUrl(),
-                'registerUrl' => '/register',
+                'dashboardUrl' => RoleHandler::DASHBOARD_URL,
+                'registerUrl' => RoleHandler::REGISTER_URL,
                 'players' => $players,
             ]
         );
@@ -76,12 +72,11 @@ class AdminHandler extends RoleHandler
             $aGame->canBeConfirmedBy($data['user']) && ($canConfirm[$aGame->getId()] = 1);
         }
 
-        return $this->getResult(
-            'games/admin.html.twig',
+        return $this->setResult(
+            self::GAMES_TPL,
             [
-                'baseUrl' => $request->getBaseUrl(),
                 'games' => $games,
-                'referrer' => $request->getRequestUri(),
+                'referrer' => isset($data['id']) ? $data['id'] : null,
                 'canConfirm' => $canConfirm,
             ]
         );
@@ -90,25 +85,26 @@ class AdminHandler extends RoleHandler
     /**
      * @param Request $request
      * @param array $data
-     * @return array
+     * @return boolean
      */
     public function confirmGameAction(Request $request, array $data = [])
     {
-        if ($this->invalidConfirmGameAction($data)) {
+        if (false && $this->invalidGamesAction($data)) {
             throw new LogicException('Missing data keys');
         }
         /** @var GameRepository $gameRepo */
         $gameRepo = $data['gameRepository'];
         /** @var Game $game */
         $game = $gameRepo->find($data['id']);
-        $messages = [];
+        $messages = ['confirmation.action' => 'Game confirmed and closed'];
         if ($game->isConfirmed()) {
-            $messages['confirmation.already'] = 'Game already confirmed';
-        } else {
-            $game->setConfirmedBy($data['user'])->setStatus(Game::CLOSED);
-            $gameRepo->save($game);
-        }
+            $messages['confirmation.action'] = 'Game already confirmed';
 
-        return $this->getRedirect($data['from']);
+            return $this->setRedirect(GameController::GAME_ROUTE_NAME, $messages);
+        }
+        $game->setConfirmedBy($data['user'])->setStatus(Game::CLOSED);
+        $gameRepo->save($game);
+
+        return $this->setRedirect(GameController::GAME_ROUTE_NAME, $messages);
     }
 }

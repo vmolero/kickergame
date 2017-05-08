@@ -18,7 +18,7 @@ parameters:
 services:
     #service_name:
     #    class: AppBundle\Directory\ClassName
-    #    arguments: ['@another_service_name', 'plain_value', '%parameter_name%']
+    #    arguments: ['@another_service_name', 'plain_value', '%parameter_name%'] , '@templating', '@session'
     app.form.registration:
         class: AppBundle\Form\RegistrationType
         tags:
@@ -35,6 +35,6 @@ services:
     app.role_handler_factory:
         class: AppBundle\RoleHandler\RoleHandlerFactory
     app.role_handler:
-        class: AppBundle\RoleHandler\AdminHandler
+        class: AppBundle\RoleHandler\RoleHandler
         factory: 'app.role_handler_factory:create'
-        arguments: ['@security.authorization_checker', '@templating', '@session']
+        arguments: ['@security.authorization_checker']

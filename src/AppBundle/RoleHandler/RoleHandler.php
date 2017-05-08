@@ -11,10 +11,106 @@ use AppBundle\Repository\TeamRepository;
 use AppBundle\Repository\UserRepository;
 use Exception;
 use LogicException;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
-abstract class RoleHandler
+abstract class RoleHandler implements RoleInterface
 {
+    private $user;
+    private $template;
+    private $parameters = [];
+    private $redirectTo;
+    private $messages = [];
+
+    public function setUser(UserInterface $user)
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    public function getRole()
+    {
+        return $this->user->getRole();
+    }
+
+    /**
+     * @return array
+     */
+    public function getMessages()
+    {
+        return $this->messages;
+    }
+
+    /**
+     * @param array $messages
+     * @return RoleHandler
+     */
+    protected function setMessages($messages)
+    {
+        $this->messages = $messages;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTemplate()
+    {
+        return $this->template;
+    }
+
+    /**
+     * @param mixed $template
+     * @return RoleHandler
+     */
+    protected function setTemplate($template)
+    {
+        $this->template = $template;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRedirectTo()
+    {
+        return $this->redirectTo;
+    }
+
+    /**
+     * @param mixed $redirectTo
+     * @return RoleHandler
+     */
+    protected function setRedirectTo($redirectTo)
+    {
+        $this->redirectTo = $redirectTo;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @param array $parameters
+     * @return RoleHandler
+     */
+    protected function setParameters($parameters)
+    {
+        $this->parameters = $parameters;
+
+        return $this;
+    }
+    
     /**
      * @param $name
      * @param Request $request
@@ -37,27 +133,27 @@ abstract class RoleHandler
      * @param array $messages
      * @return array
      */
-    protected function getResult($view, array $parameters = [], array $messages = [])
+    protected function setResult($view, array $parameters = [], array $messages = [])
     {
-        return [
-            'template' => $view,
-            'parameters' => $parameters,
-            'messages' => $messages
-        ];
+        $this->setTemplate($view);
+        $this->setParameters($parameters);
+        $this->setMessages($messages);
+        return $this;
     }
 
     /**
-     * @param $url
+     * @param $routeName
+     * @param array $messages
      * @return array
      */
-    protected function getRedirect($url, array $messages = [])
+    protected function setRedirect($routeName, array $messages = [])
     {
-        return [
-            'url' => $url,
-            'messages' => $messages
-        ];
+        $this->setRedirectTo($routeName);
+        $this->setMessages($messages);
+
+        return $this;
     }
-   
+
     /**
      * 
      * @param Request $request
@@ -70,6 +166,7 @@ abstract class RoleHandler
         if ($this->invalidNewGameAction($data)) {
             throw new LogicException('Missing data keys');
         }
+        $messages = [];
         /** @var Game $game */
         $game = new Game();
         /** @var User $user */
@@ -92,7 +189,6 @@ abstract class RoleHandler
         )->add('save', SubmitType::class, ['label' => 'Create Game']);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $messages = [];
             /** @var Game $game */
             $game = $form->getData();
             $game->setCreatedBy($user);
@@ -111,7 +207,7 @@ abstract class RoleHandler
             }
         }
 
-        return $this->getResult('games/new.html.twig',
+        return $this->setResult('games/new.html.twig',
             [
                 'form' => $form->createView(),
                 'baseUrl' => $request->getBaseUrl(),
@@ -130,12 +226,6 @@ abstract class RoleHandler
         return !(array_key_exists('id', $data) &&
             array_key_exists('gameRepository', $data) &&
             array_key_exists('user', $data));
-    }
-    
-    protected function invalidConfirmGameAction(array $data)
-    {
-        return $this->invalidGamesAction($data) ||
-            !array_key_exists('from', $data);
     }
     
     protected function invalidNewGameAction(array $data)

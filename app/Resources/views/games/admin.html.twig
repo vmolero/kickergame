@@ -4,7 +4,7 @@
     <div id="wrapper">
         <div id="container">
             <h2>Player list</h2>
-            <p><a href="{{ baseUrl }}/games/new">New game</a></p>
+            <p><a href="{{ app.request.baseUrl ~ newGameUrl}}">New game</a></p>
             <table class="table">
                 <thead>
                 <th>Id</th><th>Local</th><th>Visitor</th><th>Date</th><th>Score</th><th>Blame</th><th>Status</th>
@@ -14,8 +14,8 @@
                     <tr>
                         <td>{{ game.id }}
                             {% if (game.confirmedBy is null) %}
-                                <a href="{{ baseUrl }}/game/{{ game.id }}/score/edit">Edit score</a> |
-                                <a href="{{ baseUrl }}/game/{{ game.id }}/score/confirm?from={{ referrer|url_encode }}">Confirm score</a>
+                                <a href="{{ app.request.baseUrl }}/game/{{ game.id }}/score/edit">Edit score</a> |
+                                <a href="{{ app.request.baseUrl }}/game/{{ game.id }}/score/confirm?from={{ referrer|url_encode }}">Confirm score</a>
                             {% endif %}
                         </td>
                         <td>{{ game.local.name }}</td>
@@ -34,7 +34,7 @@
                 {% endfor %}
                 </tbody>
             </table>
-            <p><a href="{{ baseUrl }}/dashboard">Back to menu</a></p>
+            <p><a href="{{ app.request.baseUrl ~ dashboardUrl }}">Back to menu</a></p>
         </div>
     </div>
 {% endblock %}
