@@ -13,6 +13,8 @@ use Exception;
 use LogicException;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -110,22 +112,16 @@ abstract class RoleHandler implements RoleInterface
 
         return $this;
     }
-    
+
     /**
-     * @param $name
-     * @param Request $request
-     * @param array $data
-     * @return mixed
-     * @throws Exception
+     * RoleHandler constructor.
      */
-    public function handle($name, Request $request, array $data = [])
+    public function __construct(AuthorizationCheckerInterface $checker, TokenStorageInterface $storage)
     {
-        try {
-            return $this->{$name.'Action'}($request, $data);
-        } catch (Exception $m) {
-            throw $m;
-        }
+        $user = new Player($storage->getToken()->getUser());
+        $checker->isGranted(Role::ADMIN) && ($user = new Admin($user));
     }
+
 
     /**
      * @param $view
@@ -227,7 +223,7 @@ abstract class RoleHandler implements RoleInterface
             array_key_exists('gameRepository', $data) &&
             array_key_exists('user', $data));
     }
-    
+
     protected function invalidNewGameAction(array $data)
     {
         return

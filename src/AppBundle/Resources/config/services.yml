@@ -18,7 +18,7 @@ parameters:
 services:
     #service_name:
     #    class: AppBundle\Directory\ClassName
-    #    arguments: ['@another_service_name', 'plain_value', '%parameter_name%'] , '@templating', '@session'
+    #    arguments: ['@another_service_name', 'plain_value', '%parameter_name%']
     app.form.registration:
         class: AppBundle\Form\RegistrationType
         tags:
@@ -32,9 +32,6 @@ services:
         arguments: ["@fos_user.registration.form", "@request", "@fos_user.user_manager", "@fos_user.mailer", "@fos_user.util.token_generator"]
         scope: request
         public: false
-    app.role_handler_factory:
-        class: AppBundle\RoleHandler\RoleHandlerFactory
     app.role_handler:
         class: AppBundle\RoleHandler\RoleHandler
-        factory: 'app.role_handler_factory:create'
-        arguments: ['@security.authorization_checker']
+        arguments: ['@security.authorization_checker', '@security.token_storage']
