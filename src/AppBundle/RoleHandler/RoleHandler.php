@@ -13,19 +13,27 @@ use Exception;
 use LogicException;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
-abstract class RoleHandler
+abstract class RoleHandler implements RoleInterface
 {
-    const DASHBOARD_URL = '/dashboard';
-    const PLAYERS_URL = '/players';
-    const GAMES_URL = '/games';
-    const TEAMS_URL = '/teams';
-    const REGISTER_URL = '/register';
-
+    private $user;
     private $template;
     private $parameters = [];
     private $redirectTo;
     private $messages = [];
+
+    public function setUser(UserInterface $user)
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    public function getRole()
+    {
+        return $this->user->getRole();
+    }
 
     /**
      * @return array
@@ -102,9 +110,7 @@ abstract class RoleHandler
 
         return $this;
     }
-
-
-
+    
     /**
      * @param $name
      * @param Request $request

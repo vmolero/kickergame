@@ -16,9 +16,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class AdminHandler extends RoleHandler
 {
-    const DASHBOARD = 'admin/index.html.twig';
-    const PLAYERS = 'admin/players.html.twig';
-    const GAMES = 'games/admin.html.twig';
+    const DASHBOARD_TPL = 'admin/index.html.twig';
+    const PLAYERS_TPL = 'admin/players.html.twig';
+    const GAMES_TPL = 'games/admin.html.twig';
 
     /**
      * @param Request $request
@@ -27,7 +27,7 @@ class AdminHandler extends RoleHandler
      */
     public function dashboardAction(Request $request, array $data = [])
     {
-        return $this->setResult(self::DASHBOARD);
+        return $this->setResult(self::DASHBOARD_TPL);
     }
 
     /**
@@ -45,7 +45,7 @@ class AdminHandler extends RoleHandler
         $players = $userRepository->findByRole(Role::PLAYER);
 
         return $this->setResult(
-            self::PLAYERS,
+            self::PLAYERS_TPL,
             [
                 'dashboardUrl' => RoleHandler::DASHBOARD_URL,
                 'registerUrl' => RoleHandler::REGISTER_URL,
@@ -73,7 +73,7 @@ class AdminHandler extends RoleHandler
         }
 
         return $this->setResult(
-            self::GAMES,
+            self::GAMES_TPL,
             [
                 'games' => $games,
                 'referrer' => isset($data['id']) ? $data['id'] : null,
