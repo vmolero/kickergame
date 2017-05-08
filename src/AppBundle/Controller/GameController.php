@@ -82,6 +82,7 @@ class GameController extends KickerController
                 'user' => $user,
                 'gameRepository' => $this->getDoctrine()->getRepository(Game::REPOSITORY),
             ]);
+        $this->fillFlashBag($handler->getMessages());
         if (is_numeric($referrer)){
             return $this->redirectToRoute('specificPlayerGames', ['id' => $referrer]);
         }

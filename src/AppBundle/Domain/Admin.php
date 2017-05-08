@@ -6,7 +6,7 @@ use AppBundle\Entity\Role;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class Player implements RoleInterface, UserInterface
+class Admin implements RoleInterface, UserInterface
 {
     private $user;
 
@@ -20,7 +20,7 @@ class Player implements RoleInterface, UserInterface
 
     public function getRole()
     {
-        return Role::PLAYER;
+        return Role::ADMIN;
     }
 
     public function getRoles()
