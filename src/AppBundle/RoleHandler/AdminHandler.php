@@ -2,6 +2,7 @@
 
 namespace AppBundle\RoleHandler;
 
+use AppBundle\Controller\GameController;
 use AppBundle\Entity\Game;
 use AppBundle\Entity\Role;
 use AppBundle\Repository\GameRepository;
@@ -26,15 +27,7 @@ class AdminHandler extends RoleHandler
      */
     public function dashboardAction(Request $request, array $data = [])
     {
-        return $this->setResult(
-            self::DASHBOARD,
-            [
-                'registerUrl' => RoleHandler::REGISTER_URL,
-                'playersUrl' => RoleHandler::PLAYERS_URL,
-                'teamsUrl' => RoleHandler::TEAMS_URL,
-                'gamesUrl' => RoleHandler::GAMES_URL,
-            ]
-        );
+        return $this->setResult(self::DASHBOARD);
     }
 
     /**
@@ -83,7 +76,7 @@ class AdminHandler extends RoleHandler
             self::GAMES,
             [
                 'games' => $games,
-                'referrer' => $data['referrer'],
+                'referrer' => isset($data['id']) ? $data['id'] : null,
                 'canConfirm' => $canConfirm,
             ]
         );
@@ -96,7 +89,7 @@ class AdminHandler extends RoleHandler
      */
     public function confirmGameAction(Request $request, array $data = [])
     {
-        if ($this->invalidConfirmGameAction($data)) {
+        if (false && $this->invalidGamesAction($data)) {
             throw new LogicException('Missing data keys');
         }
         /** @var GameRepository $gameRepo */
@@ -107,11 +100,11 @@ class AdminHandler extends RoleHandler
         if ($game->isConfirmed()) {
             $messages['confirmation.action'] = 'Game already confirmed';
 
-            return $this->setRedirect('games', $messages);
+            return $this->setRedirect(GameController::GAME_ROUTE_NAME, $messages);
         }
         $game->setConfirmedBy($data['user'])->setStatus(Game::CLOSED);
         $gameRepo->save($game);
 
-        return $this->setRedirect('games', $messages);
+        return $this->setRedirect(GameController::GAME_ROUTE_NAME, $messages);
     }
 }

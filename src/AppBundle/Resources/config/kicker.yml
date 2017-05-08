@@ -1,0 +1,14 @@
+parameters:
+    url.dashboard: /dashboard
+    url.games: /games
+    url.players: /players
+    url.register: /register
+    url.games.new: %url.games%/new
+
+twig:
+    globals:
+        dashboardUrl: %url.dashboard%
+        registerUrl: %url.register%
+        gamesUrl: %url.games%
+        playersUrl: %url.players%
+        newGameUrl: %url.games.new%

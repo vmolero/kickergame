@@ -14,7 +14,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class GameController extends KickerController
 {
-    const GAME_ROUTE_NAME = 'game';
+    const GAME_ROUTE_NAME = 'games';
+    const SPECIFIC_PLAYER_GAME_ROUTE_NAME = 'specificPlayerGames';
     /**
      * @CFG\Security("has_role('ROLE_ADMIN') or has_role('ROLE_PLAYER')")
      * @CFG\Route("/games/new/", name="newGame")
@@ -45,15 +46,14 @@ class GameController extends KickerController
      * @CFG\Route("/games/", name="games")
      * @CFG\Route("/players/{id}/games/", name="specificPlayerGames")
      */
-    public function showGamesAction(Request $request, $player_id = null)
+    public function showGamesAction(Request $request, $id = null)
     {
         $handler = $this->get('app.role_handler');
-
         $data = $handler->handle(
-            'games',
+            self::GAME_ROUTE_NAME,
             $request,
             [
-                'id' => $player_id,
+                'id' => $id,
                 'user' => $this->container->get('security.token_storage')->getToken()->getUser(),
                 'gameRepository' => $this->getDoctrine()->getRepository(Game::REPOSITORY),
             ]
@@ -63,7 +63,7 @@ class GameController extends KickerController
 
     /**
      * @CFG\Security("has_role('ROLE_ADMIN') or has_role('ROLE_PLAYER')")
-     * @CFG\Route("/game/{id}/score/confirm", name="confirmGame")
+     * @CFG\Route("/games/{id}/score/confirm", name="confirmGame")
      * @param Request $request
      * @param integer $id
      * @return ResponseRedirect
@@ -72,13 +72,19 @@ class GameController extends KickerController
     {
         /* @var $handler RoleHandler  */
         $handler = $this->get('app.role_handler');
+        /* @var $user User  */
+        $user = $this->container->get('security.token_storage')->getToken()->getUser();
+        $referrer = $request->query->get('from');
         $handler->handle('confirmGame',
             $request,
             [
                 'id' => $id,
-                'user' => $this->container->get('security.token_storage')->getToken()->getUser(),
+                'user' => $user,
                 'gameRepository' => $this->getDoctrine()->getRepository(Game::REPOSITORY),
             ]);
+        if (is_numeric($referrer)){
+            return $this->redirectToRoute('specificPlayerGames', ['id' => $referrer]);
+        }
         return $this->redirectToRoute('games');
     }
 }

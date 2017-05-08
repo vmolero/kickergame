@@ -14,9 +14,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class PlayerHandler extends RoleHandler
 {
-    const DASHBOARD = 'players/index.html.twig';
-    const PLAYERS = 'players/index.html.twig';
-    const GAMES = 'games/players.html.twig';
+    const DASHBOARD_TPL = 'players/index.html.twig';
+    const PLAYERS_TPL = 'players/index.html.twig';
+    const GAMES_TPL = 'games/players.html.twig';
 
     /**
      * @param Request $request
@@ -25,12 +25,7 @@ class PlayerHandler extends RoleHandler
      */
     public function dashboardAction(Request $request, array $data = [])
     {
-        return $this->setResult(
-            self::DASHBOARD,
-            [
-                'gamesUrl' => RoleHandler::GAMES_URL,
-            ]
-        );
+        return $this->setResult(self::DASHBOARD_TPL);
     }
 
     /**
@@ -40,12 +35,7 @@ class PlayerHandler extends RoleHandler
      */
     public function playersAction(Request $request, array $data = [])
     {
-        return $this->setResult(
-            self::PLAYERS,
-            [
-                'url' => $request->getBaseUrl().'/games',
-            ]
-        );
+        return $this->setResult(self::PLAYERS_TPL);
     }
 
     /**
@@ -67,11 +57,10 @@ class PlayerHandler extends RoleHandler
         }
 
         return $this->setResult(
-            self::GAMES,
+            self::GAMES_TPL,
             [
-                'baseUrl' => $request->getBaseUrl(),
                 'games' => $games,
-                'referrer' => $request->getRequestUri(),
+                'referrer' => isset($data['id']) ? $data['id'] : null,
                 'canConfirm' => $canConfirm,
             ]
         );
@@ -84,7 +73,7 @@ class PlayerHandler extends RoleHandler
      */
     public function confirmGameAction(Request $request, array $data = [])
     {
-        if ($this->invalidConfirmGameAction($data)) {
+        if ($this->invalidGamesAction($data)) {
             throw new \LogicException('Missing data keys');
         }
         /* @var $gameRepo GameRepository */

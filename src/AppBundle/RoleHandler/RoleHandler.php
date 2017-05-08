@@ -11,6 +11,7 @@ use AppBundle\Repository\TeamRepository;
 use AppBundle\Repository\UserRepository;
 use Exception;
 use LogicException;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 
 abstract class RoleHandler
@@ -159,6 +160,7 @@ abstract class RoleHandler
         if ($this->invalidNewGameAction($data)) {
             throw new LogicException('Missing data keys');
         }
+        $messages = [];
         /** @var Game $game */
         $game = new Game();
         /** @var User $user */
@@ -181,7 +183,6 @@ abstract class RoleHandler
         )->add('save', SubmitType::class, ['label' => 'Create Game']);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $messages = [];
             /** @var Game $game */
             $game = $form->getData();
             $game->setCreatedBy($user);
@@ -219,12 +220,6 @@ abstract class RoleHandler
         return !(array_key_exists('id', $data) &&
             array_key_exists('gameRepository', $data) &&
             array_key_exists('user', $data));
-    }
-    
-    protected function invalidConfirmGameAction(array $data)
-    {
-        return $this->invalidGamesAction($data) ||
-            !array_key_exists('from', $data);
     }
     
     protected function invalidNewGameAction(array $data)
