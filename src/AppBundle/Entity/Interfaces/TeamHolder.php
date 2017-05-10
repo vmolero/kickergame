@@ -8,7 +8,7 @@
 
 namespace AppBundle\Entity\Interfaces;
 
-use Symfony\Component\Security\Core\User\UserInterface;
+use FOS\UserBundle\Model\UserInterface;
 
 
 /**
@@ -49,4 +49,10 @@ interface TeamHolder
      * @return Team
      */
     public function setPlayer2(UserInterface $player2);
+
+    /**
+     * @param UserInterface $player
+     * @return boolean
+     */
+    public function hasPlayer(UserInterface $player);
 }

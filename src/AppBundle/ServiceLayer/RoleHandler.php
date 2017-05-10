@@ -1,7 +1,10 @@
 <?php
 
-namespace AppBundle\RoleHandler;
+namespace AppBundle\ServiceLayer;
 
+use AppBundle\Domain\Action\Action;
+use AppBundle\Domain\Admin;
+use AppBundle\Domain\Player;
 use AppBundle\Entity\Game;
 use AppBundle\Entity\Role;
 use AppBundle\Entity\User;
@@ -9,27 +12,50 @@ use AppBundle\Form\GameType;
 use AppBundle\Repository\GameRepository;
 use AppBundle\Repository\TeamRepository;
 use AppBundle\Repository\UserRepository;
-use Exception;
 use LogicException;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 
-abstract class RoleHandler implements RoleInterface
+class RoleHandler implements RoleInterface
 {
+    /**
+     * @var Admin|Player
+     */
     private $user;
     private $template;
-    private $parameters = [];
     private $redirectTo;
-    private $messages = [];
+    /**
+     * @var ActionResponse
+     */
+    private $actionResponse;
 
-    public function setUser(UserInterface $user)
+    /**
+     * RoleHandler constructor.
+     * @param AuthorizationCheckerInterface $checker
+     * @param TokenStorageInterface $storage
+     */
+    public function __construct(AuthorizationCheckerInterface $checker, TokenStorageInterface $storage)
     {
+        $user = new Player($storage->getToken()->getUser());
+        $checker->isGranted(Role::ADMIN) && ($user = new Admin($user));
         $this->user = $user;
-        return $this;
+    }
+
+    public function handle(Action $action, array $parameters)
+    {
+        if (!isset($parameters[$this->getRoleTemplateParameter()])) {
+            throw new LogicException('YOu must provide a template for the role');
+        }
+        $this->template = $parameters[$this->getRoleTemplateParameter()];
+        $this->actionResponse = $action->visit($this->getUser());
+    }
+
+    private function getRoleTemplateParameter()
+    {
+        return strtolower(substr($this->getRole(), 5));
     }
 
     public function getRole()
@@ -38,22 +64,19 @@ abstract class RoleHandler implements RoleInterface
     }
 
     /**
+     * @return mixed
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
      * @return array
      */
     public function getMessages()
     {
-        return $this->messages;
-    }
-
-    /**
-     * @param array $messages
-     * @return RoleHandler
-     */
-    protected function setMessages($messages)
-    {
-        $this->messages = $messages;
-
-        return $this;
+        return $this->actionResponse->getMessages();
     }
 
     /**
@@ -65,14 +88,11 @@ abstract class RoleHandler implements RoleInterface
     }
 
     /**
-     * @param mixed $template
-     * @return RoleHandler
+     * @return array
      */
-    protected function setTemplate($template)
+    public function getParameters()
     {
-        $this->template = $template;
-
-        return $this;
+        return $this->actionResponse->getParameters();
     }
 
     /**
@@ -95,63 +115,7 @@ abstract class RoleHandler implements RoleInterface
     }
 
     /**
-     * @return array
-     */
-    public function getParameters()
-    {
-        return $this->parameters;
-    }
-
-    /**
-     * @param array $parameters
-     * @return RoleHandler
-     */
-    protected function setParameters($parameters)
-    {
-        $this->parameters = $parameters;
-
-        return $this;
-    }
-
-    /**
-     * RoleHandler constructor.
-     */
-    public function __construct(AuthorizationCheckerInterface $checker, TokenStorageInterface $storage)
-    {
-        $user = new Player($storage->getToken()->getUser());
-        $checker->isGranted(Role::ADMIN) && ($user = new Admin($user));
-    }
-
-
-    /**
-     * @param $view
-     * @param array $parameters
-     * @param array $messages
-     * @return array
-     */
-    protected function setResult($view, array $parameters = [], array $messages = [])
-    {
-        $this->setTemplate($view);
-        $this->setParameters($parameters);
-        $this->setMessages($messages);
-        return $this;
-    }
-
-    /**
-     * @param $routeName
-     * @param array $messages
-     * @return array
-     */
-    protected function setRedirect($routeName, array $messages = [])
-    {
-        $this->setRedirectTo($routeName);
-        $this->setMessages($messages);
-
-        return $this;
-    }
-
-    /**
-     * 
+     *
      * @param Request $request
      * @param array $data
      * @return type
@@ -203,25 +167,14 @@ abstract class RoleHandler implements RoleInterface
             }
         }
 
-        return $this->setResult('games/new.html.twig',
+        return $this->setResult(
+            'games/new.html.twig',
             [
                 'form' => $form->createView(),
                 'baseUrl' => $request->getBaseUrl(),
-            ], 
+            ],
             $messages
         );
-    }
-    
-    protected function invalidPlayersAction(array $data)
-    {
-        return !(array_key_exists('userRepository', $data));
-    }
-    
-    protected function invalidGamesAction(array $data)
-    {
-        return !(array_key_exists('id', $data) &&
-            array_key_exists('gameRepository', $data) &&
-            array_key_exists('user', $data));
     }
 
     protected function invalidNewGameAction(array $data)
@@ -232,5 +185,45 @@ abstract class RoleHandler implements RoleInterface
                 array_key_exists('gameRepository', $data) &&
                 array_key_exists('user', $data) &&
                 array_key_exists('formFactory', $data));
+    }
+
+    /**
+     * @param $view
+     * @param array $parameters
+     * @param array $messages
+     * @return array
+     */
+    protected function setResult($view, array $parameters = [], array $messages = [])
+    {
+        $this->setTemplate($view);
+        $this->setParameters($parameters);
+        $this->setMessages($messages);
+
+        return $this;
+    }
+
+    /**
+     * @param $routeName
+     * @param array $messages
+     * @return array
+     */
+    protected function setRedirect($routeName, array $messages = [])
+    {
+        $this->setRedirectTo($routeName);
+        $this->setMessages($messages);
+
+        return $this;
+    }
+
+    protected function invalidPlayersAction(array $data)
+    {
+        return !(array_key_exists('userRepository', $data));
+    }
+
+    protected function invalidGamesAction(array $data)
+    {
+        return !(array_key_exists('id', $data) &&
+            array_key_exists('gameRepository', $data) &&
+            array_key_exists('user', $data));
     }
 }

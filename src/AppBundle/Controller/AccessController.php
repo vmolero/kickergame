@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Domain\Action\DashboardAction;
 use AppBundle\RoleHandler\RoleHandler;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as CFG;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,7 +32,8 @@ class AccessController extends KickerController
     {
         /* @var $handler RoleHandler  */
         $handler = $this->get('app.role_handler');
-        $data = $handler->handle('dashboard', $request);
-        return $this->buildResponse($data);
+        $handler->handle(new DashboardAction($request), $this->getParameter('template.dashboard'));
+
+        return $this->buildResponse($handler);
     }
 }

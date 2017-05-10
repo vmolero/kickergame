@@ -2,7 +2,7 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\RoleHandler\RoleHandler;
+use AppBundle\ServiceLayer\RoleHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**

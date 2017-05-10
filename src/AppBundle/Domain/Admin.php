@@ -2,51 +2,22 @@
 
 namespace AppBundle\Domain;
 
-use AppBundle\Entity\Role;
-use Symfony\Component\Security\Core\Role\RoleInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
+use FOS\UserBundle\Model\UserInterface;
 
-class Admin implements RoleInterface, UserInterface
+/**
+ * Class Admin
+ * @package AppBundle\Domain
+ */
+class Admin extends RoleUser
 {
-    private $user;
 
     /**
-     * Player constructor.
+     * Admin constructor.
+     * @param UserInterface $user
      */
     public function __construct(UserInterface $user)
     {
-        $this->user = $user;
+        parent::__construct($user);
+        $this->setRole(RoleUser::ADMIN);
     }
-
-    public function getRole()
-    {
-        return Role::ADMIN;
-    }
-
-    public function getRoles()
-    {
-        return $this->user->getRoles();
-    }
-
-    public function getPassword()
-    {
-        return $this->user->getPassword();
-    }
-
-    public function getSalt()
-    {
-        return $this->user->getSalt();
-    }
-
-    public function getUsername()
-    {
-        return $this->user->getUsername();
-    }
-
-    public function eraseCredentials()
-    {
-        return $this->user->eraseCredentials();
-    }
-
-
 }

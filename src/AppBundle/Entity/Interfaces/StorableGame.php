@@ -9,7 +9,7 @@
 namespace AppBundle\Entity\Interfaces;
 
 use AppBundle\Entity\Game;
-use Symfony\Component\Security\Core\User\UserInterface;
+use FOS\UserBundle\Model\UserInterface;
 
 
 interface StorableGame

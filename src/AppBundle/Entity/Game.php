@@ -6,7 +6,7 @@ use AppBundle\Entity\Interfaces\StorableGame;
 use AppBundle\Entity\Interfaces\TeamHolder;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
+use FOS\UserBundle\Model\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -190,10 +190,15 @@ class Game implements StorableGame
             return false;
         }
         $can = $player->hasRole(Role::PLAYER);
+        /** @var User $userWhoCreated */
         $userWhoCreated = $this->getCreatedBy();
+        return $can && $this->isConfirmingPlayerAnOpponent($player, $userWhoCreated);
+    }
 
-        return $can && $this->getLocal()->hasPlayer($player) && $this->getVisitor()->hasPlayer($userWhoCreated) ||
-            $this->getVisitor()->hasPlayer($player) && $this->getLocal()->hasPlayer($userWhoCreated);
+    private function isConfirmingPlayerAnOpponent(UserInterface $confirming, UserInterface $gameCreator)
+    {
+        return $this->getLocal()->hasPlayer($confirming) && $this->getVisitor()->hasPlayer($gameCreator) ||
+            $this->getVisitor()->hasPlayer($confirming) && $this->getLocal()->hasPlayer($gameCreator);
     }
 
     public function isConfirmed()
@@ -202,7 +207,7 @@ class Game implements StorableGame
     }
 
     /**
-     * @return mixed
+     * @return UserInterface
      */
     public function getConfirmedBy()
     {
@@ -240,7 +245,7 @@ class Game implements StorableGame
     }
 
     /**
-     * @return mixed
+     * @return TeamHolder
      */
     public function getLocal()
     {
@@ -248,7 +253,7 @@ class Game implements StorableGame
     }
 
     /**
-     * @param mixed $local
+     * @param TeamHolder $local
      * @return Game
      */
     public function setLocal(TeamHolder $local)
@@ -259,7 +264,7 @@ class Game implements StorableGame
     }
 
     /**
-     * @return mixed
+     * @return TeamHolder
      */
     public function getVisitor()
     {
@@ -267,7 +272,7 @@ class Game implements StorableGame
     }
 
     /**
-     * @param mixed $visitor
+     * @param TeamHolder $visitor
      * @return Game
      */
     public function setVisitor(TeamHolder $visitor)

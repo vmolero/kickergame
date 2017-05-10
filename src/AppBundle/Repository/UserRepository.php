@@ -2,6 +2,10 @@
 
 namespace AppBundle\Repository;
 
+use AppBundle\Domain\Admin;
+use AppBundle\Domain\Player;
+use AppBundle\Domain\RoleUser;
+use AppBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
 
 class UserRepository extends EntityRepository
@@ -14,6 +18,24 @@ class UserRepository extends EntityRepository
             ->where('u.roles LIKE :roles')
             ->setParameter('roles', '%"'.$role.'"%');
 
-        return $qb->getQuery()->getResult();
+        return $this->toCollection($qb->getQuery()->getResult());
+    }
+
+    public function findAll()
+    {
+        return $this->toCollection(parent::findAll());
+    }
+
+    public function toCollection(array $objects)
+    {
+        $collection = [];
+        /** @var User $object */
+        foreach ($objects as $object) {
+            $user = new Player($object);
+            $object->hasRole(RoleUser::ADMIN) && ($user = new Admin($user));
+            $collection[] = $user;
+        }
+
+        return $collection;
     }
 }

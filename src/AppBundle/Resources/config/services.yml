@@ -1,18 +1,17 @@
 # Learn more about services, parameters and containers at
 # http://symfony.com/doc/current/service_container.html
 parameters:
-    template:
-        dashboard:
+    template.dashboard:
             admin: admin/index.html.twig
             player: players/index.html.twig
-        players:
-            admin: admin/index.html.twig
-            player: players/index.html.twig
-        games:
+    template.players:
+            admin: admin/players.html.twig
+            player: players/players.html.twig
+    template.games:
             admin: games/admin.html.twig
             player: games/players.html.twig
-        newGame: games/new.html.twig
-        newPlayer: UserBundle:Registration:register.html.twig    
+    template.newGame: games/new.html.twig
+    template.newPlayer: UserBundle:Registration:register.html.twig
             
 
 services:
@@ -33,5 +32,5 @@ services:
         scope: request
         public: false
     app.role_handler:
-        class: AppBundle\RoleHandler\RoleHandler
+        class: AppBundle\ServiceLayer\RoleHandler
         arguments: ['@security.authorization_checker', '@security.token_storage']

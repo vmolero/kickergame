@@ -4,7 +4,7 @@ namespace AppBundle\Entity;
 
 use AppBundle\Entity\Interfaces\TeamHolder;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
+use FOS\UserBundle\Model\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass="AppBundle\Repository\TeamRepository")
@@ -21,22 +21,30 @@ class Team implements TeamHolder
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
+     * @var integer
      */
     protected $id;
 
     /**
      * @ORM\Column(name="name", nullable=true)
+     *
+     * @var string
      */
     protected $name;
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="id", cascade={"persist"})
      * @ORM\JoinColumn(name="player1", referencedColumnName="id")
+     *
+     * @var UserInterface
      */
     protected $player1;
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="id", cascade={"persist"})
      * @ORM\JoinColumn(name="player2", referencedColumnName="id")
+     *
+     * @var UserInterface
      */
     protected $player2;
 
@@ -66,7 +74,7 @@ class Team implements TeamHolder
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getName()
     {
@@ -77,7 +85,7 @@ class Team implements TeamHolder
     }
 
     /**
-     * @param mixed $name
+     * @param string $name
      * @return Team
      */
     public function setName($name)
@@ -88,7 +96,7 @@ class Team implements TeamHolder
     }
 
     /**
-     * @return mixed
+     * @return UserInterface
      */
     public function getPlayer1()
     {
@@ -96,7 +104,7 @@ class Team implements TeamHolder
     }
 
     /**
-     * @param mixed $player1
+     * @param UserInterface $player1
      * @return Team
      */
     public function setPlayer1(UserInterface $player1)
@@ -107,7 +115,7 @@ class Team implements TeamHolder
     }
 
     /**
-     * @return mixed
+     * @return UserInterface
      */
     public function getPlayer2()
     {
@@ -115,7 +123,7 @@ class Team implements TeamHolder
     }
 
     /**
-     * @param mixed $player2
+     * @param UserInterface $player2
      * @return Team
      */
     public function setPlayer2(UserInterface $player2)
@@ -132,6 +140,7 @@ class Team implements TeamHolder
 
     public function hasPlayer(UserInterface $player)
     {
-        return $player === $this->player1 || $player === $this->player2;
+        return $player->getEmail() === $this->player1->getEmail() ||
+            $player->getEmail() === $this->player2->getEmail();
     }
 }

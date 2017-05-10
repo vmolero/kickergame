@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Domain\Action\DisplayGamesAction;
 use AppBundle\Entity\Game;
 use AppBundle\Entity\Team;
 use AppBundle\Entity\User;
@@ -16,6 +17,7 @@ class GameController extends KickerController
 {
     const GAME_ROUTE_NAME = 'games';
     const SPECIFIC_PLAYER_GAME_ROUTE_NAME = 'specificPlayerGames';
+
     /**
      * @CFG\Security("has_role('ROLE_ADMIN') or has_role('ROLE_PLAYER')")
      * @CFG\Route("/games/new/", name="newGame")
@@ -25,10 +27,9 @@ class GameController extends KickerController
      */
     public function showFormNewGameAction(Request $request)
     {
-        /* @var $handler RoleHandler  */
+        /* @var $handler RoleHandler */
         $handler = $this->get('app.role_handler');
-        $handler->handle(
-            'newGame',
+        $handler->newGameAction(
             $request,
             [
                 'user' => $this->container->get('security.token_storage')->getToken()->getUser(),
@@ -38,6 +39,7 @@ class GameController extends KickerController
                 'formFactory' => $this->get('form.factory'),
             ]
         );
+
         return $this->buildResponse($handler);
     }
 
@@ -49,16 +51,12 @@ class GameController extends KickerController
     public function showGamesAction(Request $request, $id = null)
     {
         $handler = $this->get('app.role_handler');
-        $data = $handler->handle(
-            self::GAME_ROUTE_NAME,
-            $request,
-            [
-                'id' => $id,
-                'user' => $this->container->get('security.token_storage')->getToken()->getUser(),
-                'gameRepository' => $this->getDoctrine()->getRepository(Game::REPOSITORY),
-            ]
+        $handler->handle(
+            new DisplayGamesAction($request, $this->getDoctrine()->getRepository(Game::REPOSITORY), $id),
+            $this->getParameter('template.games')
         );
-        return $this->buildResponse($data);
+
+        return $this->buildResponse($handler);
     }
 
     /**
@@ -70,22 +68,25 @@ class GameController extends KickerController
      */
     public function confirmGameAction(Request $request, $id)
     {
-        /* @var $handler RoleHandler  */
+        /* @var $handler RoleHandler */
         $handler = $this->get('app.role_handler');
-        /* @var $user User  */
+        /* @var $user User */
         $user = $this->container->get('security.token_storage')->getToken()->getUser();
         $referrer = $request->query->get('from');
-        $handler->handle('confirmGame',
+        $handler->handle(
+            'confirmGame',
             $request,
             [
                 'id' => $id,
                 'user' => $user,
                 'gameRepository' => $this->getDoctrine()->getRepository(Game::REPOSITORY),
-            ]);
+            ]
+        );
         $this->fillFlashBag($handler->getMessages());
-        if (is_numeric($referrer)){
+        if (is_numeric($referrer)) {
             return $this->redirectToRoute('specificPlayerGames', ['id' => $referrer]);
         }
+
         return $this->redirectToRoute('games');
     }
 }
