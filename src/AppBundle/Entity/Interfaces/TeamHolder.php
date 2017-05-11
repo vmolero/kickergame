@@ -8,7 +8,7 @@
 
 namespace AppBundle\Entity\Interfaces;
 
-use FOS\UserBundle\Model\UserInterface;
+use AppBundle\Domain\Interfaces\KickerUserInterface;
 
 
 /**
@@ -34,10 +34,10 @@ interface TeamHolder
     public function getPlayer1();
 
     /**
-     * @param mixed $player1
+     * @param KickerUserInterface $player1
      * @return Team
      */
-    public function setPlayer1(UserInterface $player1);
+    public function setPlayer1(KickerUserInterface $player1);
 
     /**
      * @return mixed
@@ -45,14 +45,14 @@ interface TeamHolder
     public function getPlayer2();
 
     /**
-     * @param mixed $player2
+     * @param KickerUserInterface $player2
      * @return Team
      */
-    public function setPlayer2(UserInterface $player2);
+    public function setPlayer2(KickerUserInterface $player2);
 
     /**
-     * @param UserInterface $player
+     * @param KickerUserInterface $player
      * @return boolean
      */
-    public function hasPlayer(UserInterface $player);
+    public function hasPlayer(KickerUserInterface $player);
 }

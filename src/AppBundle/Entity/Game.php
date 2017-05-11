@@ -189,16 +189,11 @@ class Game implements StorableGame
         if ($this->isConfirmed()) {
             return false;
         }
-        $can = $player->hasRole(Role::PLAYER);
-        /** @var User $userWhoCreated */
-        $userWhoCreated = $this->getCreatedBy();
-        return $can && $this->isConfirmingPlayerAnOpponent($player, $userWhoCreated);
-    }
+        if ($player->hasRole(Role::ADMIN)) {
+            return true;
+        }
 
-    private function isConfirmingPlayerAnOpponent(UserInterface $confirming, UserInterface $gameCreator)
-    {
-        return $this->getLocal()->hasPlayer($confirming) && $this->getVisitor()->hasPlayer($gameCreator) ||
-            $this->getVisitor()->hasPlayer($confirming) && $this->getLocal()->hasPlayer($gameCreator);
+        return $this->isConfirmingPlayerAnOpponent($player);
     }
 
     public function isConfirmed()
@@ -215,7 +210,7 @@ class Game implements StorableGame
     }
 
     /**
-     * @param mixed $confirmedBy
+     * @param UserInterface $confirmedBy
      * @return Game
      */
     public function setConfirmedBy(UserInterface $confirmedBy)
@@ -223,6 +218,15 @@ class Game implements StorableGame
         $this->confirmedBy = $confirmedBy;
 
         return $this;
+    }
+
+    private function isConfirmingPlayerAnOpponent(UserInterface $confirming)
+    {
+        /** @var User $userWhoCreated */
+        $gameCreator = $this->getCreatedBy();
+
+        return $this->getLocal()->hasPlayer($confirming) && $this->getVisitor()->hasPlayer($gameCreator) ||
+            $this->getVisitor()->hasPlayer($confirming) && $this->getLocal()->hasPlayer($gameCreator);
     }
 
     /**

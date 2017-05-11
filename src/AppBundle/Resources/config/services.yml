@@ -10,8 +10,10 @@ parameters:
     template.games:
             admin: games/admin.html.twig
             player: games/players.html.twig
-    template.newGame: games/new.html.twig
-    template.newPlayer: UserBundle:Registration:register.html.twig
+    template.newgame:
+            admin: games/new.html.twig
+            player: games/new.html.twig
+    template.newplayer: UserBundle:Registration:register.html.twig
             
 
 services:
@@ -34,3 +36,16 @@ services:
     app.role_handler:
         class: AppBundle\ServiceLayer\RoleHandler
         arguments: ['@security.authorization_checker', '@security.token_storage']
+    app.user_repository:
+            class: Doctrine\ORM\EntityRepository
+            factory: ["@doctrine.orm.entity_manager", getRepository]
+            arguments:
+                - AppBundle\Entity\User
+    app.team_repository:
+                class: Doctrine\ORM\EntityRepository
+                factory: ["@doctrine.orm.entity_manager", getRepository]
+                arguments:
+                    - AppBundle\Entity\Team
+    app.game_form_provider:
+        class: AppBundle\ServiceLayer\GameFormProvider
+        arguments: ['@form.factory', '@app.user_repository', '@app.team_repository']

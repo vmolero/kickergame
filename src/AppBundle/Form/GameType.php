@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form;
 
+use AppBundle\Domain\Interfaces\KickerUserInterface;
 use AppBundle\Entity\Game;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -21,7 +22,7 @@ class GameType extends AbstractType
                 'local',
                 TeamType::class,
                 [
-                    'players' => $players,
+                    'players' => array_map(function (KickerUserInterface $player) { return $player->getEntity(); }, $players),
                     'label' => 'Local team',
                 ]
             )
@@ -29,7 +30,7 @@ class GameType extends AbstractType
                 'visitor',
                 TeamType::class,
                 [
-                    'players' => $players,
+                    'players' => array_map(function (KickerUserInterface $player) { return $player->getEntity(); }, $players),
                     'label' => 'Visitor team',
                 ]
             )

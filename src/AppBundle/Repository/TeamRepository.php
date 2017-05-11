@@ -2,17 +2,17 @@
 
 namespace AppBundle\Repository;
 
+use AppBundle\Domain\Interfaces\KickerUserInterface;
 use AppBundle\Entity\Game;
 use AppBundle\Entity\Interfaces\TeamHolder;
-use AppBundle\Entity\Team;
 use Doctrine\ORM\EntityRepository;
-use Symfony\Component\Security\Core\User\UserInterface;
+
 
 class TeamRepository extends EntityRepository
 {
-    public function fetchTeamsIfExist(UserInterface $player1, UserInterface $player2)
+    public function fetchTeamsIfExist(KickerUserInterface $player1, KickerUserInterface $player2)
     {
-        return $this->findOneBy(['player1' => $player1, 'player2' => $player2]);
+        return $this->findOneBy(['player1' => $player1->getEntity(), 'player2' => $player2->getEntity()]);
     }
 
     /**

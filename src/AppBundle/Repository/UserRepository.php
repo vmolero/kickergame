@@ -4,7 +4,7 @@ namespace AppBundle\Repository;
 
 use AppBundle\Domain\Admin;
 use AppBundle\Domain\Player;
-use AppBundle\Domain\RoleUser;
+use AppBundle\Entity\Role;
 use AppBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
 
@@ -21,21 +21,21 @@ class UserRepository extends EntityRepository
         return $this->toCollection($qb->getQuery()->getResult());
     }
 
-    public function findAll()
-    {
-        return $this->toCollection(parent::findAll());
-    }
-
     public function toCollection(array $objects)
     {
         $collection = [];
         /** @var User $object */
         foreach ($objects as $object) {
             $user = new Player($object);
-            $object->hasRole(RoleUser::ADMIN) && ($user = new Admin($user));
+            $object->hasRole(Role::ADMIN) && ($user = new Admin($user));
             $collection[] = $user;
         }
 
         return $collection;
+    }
+
+    public function findAll()
+    {
+        return $this->toCollection(parent::findAll());
     }
 }

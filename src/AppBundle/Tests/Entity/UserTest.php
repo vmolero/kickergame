@@ -17,7 +17,7 @@ class UserTest extends DomainTestCase
     public function testAddRole()
     {
         $role1 = Role::create(Role::ADMIN);
-        $role2 = Role::create(Role::PLAYER)->getType();
+        $role2 = Role::create(Role::PLAYER)->getRole();
         $user = $this->user;
         $user->addRole($role1);
         $user->addRole($role2);
@@ -30,7 +30,7 @@ class UserTest extends DomainTestCase
         $user =  $this->user;
         $role1 = Role::create(Role::ADMIN);
         $user->addRole($role1);
-        $this->assertTrue($this->invokeMethod($user, 'isValidRole', [$role1->getType()]));
+        $this->assertTrue($this->invokeMethod($user, 'isValidRole', [$role1->getRole()]));
     }
 
     public function testIsValidStringRole()

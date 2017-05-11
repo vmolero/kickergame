@@ -2,7 +2,9 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Domain\Action\ConfirmGameAction;
 use AppBundle\Domain\Action\DisplayGamesAction;
+use AppBundle\Domain\Action\DisplayGamesFormAction;
 use AppBundle\Entity\Game;
 use AppBundle\Entity\Team;
 use AppBundle\Entity\User;
@@ -29,15 +31,13 @@ class GameController extends KickerController
     {
         /* @var $handler RoleHandler */
         $handler = $this->get('app.role_handler');
-        $handler->newGameAction(
-            $request,
-            [
-                'user' => $this->container->get('security.token_storage')->getToken()->getUser(),
-                'userRepository' => $this->getDoctrine()->getRepository(User::REPOSITORY),
-                'teamRepository' => $this->getDoctrine()->getRepository(Team::REPOSITORY),
-                'gameRepository' => $this->getDoctrine()->getRepository(Game::REPOSITORY),
-                'formFactory' => $this->get('form.factory'),
-            ]
+        /** @var FormInterface $form */
+
+        $handler->handle(
+            new DisplayGamesFormAction($request,
+                $this->getDoctrine()->getRepository(Game::REPOSITORY),
+                $this->get('app.game_form_provider')),
+            $this->getParameter('template.newgame')
         );
 
         return $this->buildResponse($handler);
@@ -50,6 +50,7 @@ class GameController extends KickerController
      */
     public function showGamesAction(Request $request, $id = null)
     {
+        /** @var $handler RoleHandler */
         $handler = $this->get('app.role_handler');
         $handler->handle(
             new DisplayGamesAction($request, $this->getDoctrine()->getRepository(Game::REPOSITORY), $id),
@@ -70,17 +71,9 @@ class GameController extends KickerController
     {
         /* @var $handler RoleHandler */
         $handler = $this->get('app.role_handler');
-        /* @var $user User */
-        $user = $this->container->get('security.token_storage')->getToken()->getUser();
         $referrer = $request->query->get('from');
         $handler->handle(
-            'confirmGame',
-            $request,
-            [
-                'id' => $id,
-                'user' => $user,
-                'gameRepository' => $this->getDoctrine()->getRepository(Game::REPOSITORY),
-            ]
+            new ConfirmGameAction($request, $this->getDoctrine()->getRepository(Game::REPOSITORY), $id)
         );
         $this->fillFlashBag($handler->getMessages());
         if (is_numeric($referrer)) {

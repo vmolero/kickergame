@@ -2,6 +2,10 @@
 
 namespace AppBundle\Domain\Action;
 
+/**
+ * Class NullActionResponse
+ * @package AppBundle\Domain\Action
+ */
 class NullActionResponse
 {
     /**

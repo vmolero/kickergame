@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Domain;
 
+use AppBundle\Entity\Role;
 use FOS\UserBundle\Model\UserInterface;
 
 /**
@@ -17,6 +18,6 @@ class Player extends RoleUser
     public function __construct(UserInterface $user)
     {
         parent::__construct($user);
-        $this->setRole(RoleUser::PLAYER);
+        $this->setRole(Role::create(Role::PLAYER));
     }
 }

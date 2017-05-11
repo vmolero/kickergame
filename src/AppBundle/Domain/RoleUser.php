@@ -3,6 +3,8 @@
 namespace AppBundle\Domain;
 
 
+use AppBundle\Domain\Interfaces\KickerUserInterface;
+use AppBundle\Entity\Interfaces\RoleHolder;
 use FOS\UserBundle\Model\UserInterface;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 
@@ -10,17 +12,14 @@ use Symfony\Component\Security\Core\Role\RoleInterface;
  * Class RoleUser
  * @package AppBundle\Domain
  */
-abstract class RoleUser implements UserInterface, RoleInterface
+abstract class RoleUser implements KickerUserInterface, RoleInterface
 {
-    const ADMIN = 'ROLE_ADMIN';
-    const PLAYER = 'ROLE_PLAYER';
-
     /**
      * @var UserInterface
      */
     private $user;
     /**
-     * @var string
+     * @var RoleHolder
      */
     private $role;
 
@@ -111,13 +110,13 @@ abstract class RoleUser implements UserInterface, RoleInterface
      */
     public function getRole()
     {
-        return $this->role;
+        return $this->role->getRole();
     }
 
     /**
      * @param $role
      */
-    protected function setRole($role)
+    protected function setRole(RoleInterface $role)
     {
         $this->role = $role;
     }
@@ -388,5 +387,11 @@ abstract class RoleUser implements UserInterface, RoleInterface
         return $this->user->unserialize($serialized);
     }
 
-
+    /**
+     * @return UserInterface
+     */
+    public function getEntity()
+    {
+        return $this->user->getEntity();
+    }
 }

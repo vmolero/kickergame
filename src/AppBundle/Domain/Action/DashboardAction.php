@@ -3,7 +3,7 @@
 namespace AppBundle\Domain\Action;
 
 
-use FOS\UserBundle\Model\UserInterface;
+use AppBundle\Domain\Interfaces\KickerUserInterface;
 
 /**
  * Class DashboardAction
@@ -12,19 +12,19 @@ use FOS\UserBundle\Model\UserInterface;
 class DashboardAction extends Action
 {
     /**
-     * @param UserInterface $user
+     * @param KickerUserInterface $user
      * @return NullActionResponse
      */
-    public function visitPlayer(UserInterface $user)
+    public function visitPlayer(KickerUserInterface $user)
     {
         return new NullActionResponse();
     }
 
     /**
-     * @param UserInterface $user
+     * @param KickerUserInterface $user
      * @return NullActionResponse
      */
-    public function visitAdmin(UserInterface $user)
+    public function visitAdmin(KickerUserInterface $user)
     {
         return new NullActionResponse();
     }

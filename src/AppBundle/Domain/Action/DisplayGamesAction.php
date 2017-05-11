@@ -3,9 +3,9 @@
 namespace AppBundle\Domain\Action;
 
 
+use AppBundle\Domain\Interfaces\KickerUserInterface;
 use AppBundle\Entity\Game;
 use AppBundle\Repository\GameRepository;
-use FOS\UserBundle\Model\UserInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -37,10 +37,10 @@ class DisplayGamesAction extends Action
     }
 
     /**
-     * @param UserInterface $user
+     * @param KickerUserInterface $user
      * @return ActionResponse
      */
-    public function visitPlayer(UserInterface $user)
+    public function visitPlayer(KickerUserInterface $user)
     {
         if ($this->playerId !== null) {
             $gameCollection = $this->gameRepo->findAllTheGamesByPlayer($this->playerId);
@@ -52,11 +52,11 @@ class DisplayGamesAction extends Action
     }
 
     /**
-     * @param UserInterface $user
+     * @param KickerUserInterface $user
      * @param array $gameCollection
      * @return ActionResponse
      */
-    private function buildResponseFor(UserInterface $user, array $gameCollection)
+    private function buildResponseFor(KickerUserInterface $user, array $gameCollection)
     {
         $canConfirm = [];
         /** @var $aGame Game */
@@ -74,10 +74,10 @@ class DisplayGamesAction extends Action
     }
 
     /**
-     * @param UserInterface $user
+     * @param KickerUserInterface $user
      * @return ActionResponse
      */
-    public function visitAdmin(UserInterface $user)
+    public function visitAdmin(KickerUserInterface $user)
     {
         $gameCollection = $this->gameRepo->findAll();
 

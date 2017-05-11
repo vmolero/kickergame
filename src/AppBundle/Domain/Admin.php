@@ -2,6 +2,7 @@
 
 namespace AppBundle\Domain;
 
+use AppBundle\Entity\Role;
 use FOS\UserBundle\Model\UserInterface;
 
 /**
@@ -18,6 +19,6 @@ class Admin extends RoleUser
     public function __construct(UserInterface $user)
     {
         parent::__construct($user);
-        $this->setRole(RoleUser::ADMIN);
+        $this->setRole(Role::create(Role::ADMIN));
     }
 }

@@ -5,27 +5,29 @@ namespace AppBundle\ServiceLayer;
 use AppBundle\Domain\Action\Action;
 use AppBundle\Domain\Admin;
 use AppBundle\Domain\Player;
-use AppBundle\Entity\Game;
 use AppBundle\Entity\Role;
-use AppBundle\Entity\User;
-use AppBundle\Form\GameType;
-use AppBundle\Repository\GameRepository;
-use AppBundle\Repository\TeamRepository;
-use AppBundle\Repository\UserRepository;
 use LogicException;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 
+/**
+ * Class RoleHandler
+ * @package AppBundle\ServiceLayer
+ */
 class RoleHandler implements RoleInterface
 {
     /**
      * @var Admin|Player
      */
     private $user;
+    /**
+     * @var string
+     */
     private $template;
+    /**
+     * @var string
+     */
     private $redirectTo;
     /**
      * @var ActionResponse
@@ -44,23 +46,20 @@ class RoleHandler implements RoleInterface
         $this->user = $user;
     }
 
-    public function handle(Action $action, array $parameters)
+    /**
+     * @param Action $action
+     * @param array $parameters
+     * @return $this
+     */
+    public function handle(Action $action, array $parameters = [])
     {
-        if (!isset($parameters[$this->getRoleTemplateParameter()])) {
-            throw new LogicException('YOu must provide a template for the role');
-        }
-        $this->template = $parameters[$this->getRoleTemplateParameter()];
         $this->actionResponse = $action->visit($this->getUser());
-    }
 
-    private function getRoleTemplateParameter()
-    {
-        return strtolower(substr($this->getRole(), 5));
-    }
+        if (isset($parameters[$this->getRoleTemplateParameter()])) {
+            $this->setTemplateFromConfig($parameters);
+        }
 
-    public function getRole()
-    {
-        return $this->user->getRole();
+        return $this;
     }
 
     /**
@@ -69,6 +68,38 @@ class RoleHandler implements RoleInterface
     public function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRoleTemplateParameter()
+    {
+        return strtolower(substr($this->getRole(), 5));
+    }
+
+    /**
+     * @return string
+     */
+    public function getRole()
+    {
+        return $this->user->getRole();
+    }
+
+    /**
+     * @param array $parameters
+     * @return $this
+     */
+    public function setTemplateFromConfig(array $parameters)
+    {
+        if (!is_null($parameters) &&
+            !isset($parameters[$this->getRoleTemplateParameter()])
+        ) {
+            throw new LogicException('You must provide a template for the role');
+        }
+        $this->setTemplate($parameters[$this->getRoleTemplateParameter()]);
+
+        return $this;
     }
 
     /**
@@ -85,6 +116,17 @@ class RoleHandler implements RoleInterface
     public function getTemplate()
     {
         return $this->template;
+    }
+
+    /**
+     * @param $templatePath
+     * @return $this
+     */
+    public function setTemplate($templatePath)
+    {
+        $this->template = $templatePath;
+
+        return $this;
     }
 
     /**
@@ -115,79 +157,6 @@ class RoleHandler implements RoleInterface
     }
 
     /**
-     *
-     * @param Request $request
-     * @param array $data
-     * @return type
-     * @throws LogicException
-     */
-    public function newGameAction(Request $request, array $data = [])
-    {
-        if ($this->invalidNewGameAction($data)) {
-            throw new LogicException('Missing data keys');
-        }
-        $messages = [];
-        /** @var Game $game */
-        $game = new Game();
-        /** @var User $user */
-        $user = $data['user'];
-        /** @var UserRepository $userRepository */
-        $userRepository = $data['userRepository'];
-        /** @var TeamRepository $teamRepository */
-        $teamRepository = $data['teamRepository'];
-        /** @var GameRepository $gameRepository */
-        $gameRepository = $data['gameRepository'];
-        /** @var FormFactoryInterface $formFactory */
-        $formFactory = $data['formFactory'];
-        /** @var FormInterface $form */
-        $form = $formFactory->create(
-            GameType::class,
-            $game,
-            [
-                'players' => $userRepository->findByRole(Role::PLAYER),
-            ]
-        )->add('save', SubmitType::class, ['label' => 'Create Game']);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var Game $game */
-            $game = $form->getData();
-            $game->setCreatedBy($user);
-            if ($game->hasConflicts()) {
-                $messages[] = ['alert' => 'Game has team conflicts'];
-                // $this->getSession()->getFlashBag()->set('registrationMessage', 'Game has team conflicts');
-            } else {
-                if ($user->hasRole(Role::PLAYER) && !$game->hasPlayer($user)) {
-                    $messages[] = ['alert' => 'You must be part of the game'];
-                } else {
-                    $game = $teamRepository->useExistingTeamsFor($game);
-                    $game->setStatus(Game::OPEN);
-                    $gameRepository->save($game);
-                    $messages[] = ['alert' => 'Game saved'];
-                }
-            }
-        }
-
-        return $this->setResult(
-            'games/new.html.twig',
-            [
-                'form' => $form->createView(),
-                'baseUrl' => $request->getBaseUrl(),
-            ],
-            $messages
-        );
-    }
-
-    protected function invalidNewGameAction(array $data)
-    {
-        return
-            !(array_key_exists('userRepository', $data) &&
-                array_key_exists('teamRepository', $data) &&
-                array_key_exists('gameRepository', $data) &&
-                array_key_exists('user', $data) &&
-                array_key_exists('formFactory', $data));
-    }
-
-    /**
      * @param $view
      * @param array $parameters
      * @param array $messages
@@ -213,17 +182,5 @@ class RoleHandler implements RoleInterface
         $this->setMessages($messages);
 
         return $this;
-    }
-
-    protected function invalidPlayersAction(array $data)
-    {
-        return !(array_key_exists('userRepository', $data));
-    }
-
-    protected function invalidGamesAction(array $data)
-    {
-        return !(array_key_exists('id', $data) &&
-            array_key_exists('gameRepository', $data) &&
-            array_key_exists('user', $data));
     }
 }

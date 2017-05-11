@@ -3,12 +3,12 @@
 namespace AppBundle\Domain\Action;
 
 
+use AppBundle\Domain\Interfaces\KickerUserInterface;
 use AppBundle\Entity\Role;
-use LogicException;
 use AppBundle\RoleHandler\RoleHandler;
+use LogicException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Role\RoleInterface;
-use FOS\UserBundle\Model\UserInterface;
 
 /**
  * Class Action
@@ -17,9 +17,9 @@ use FOS\UserBundle\Model\UserInterface;
 abstract class Action
 {
     /**
-     * @var null|Request
+     * @var Request
      */
-    protected $request = null;
+    protected $request;
 
     /**
      * Action constructor.
@@ -36,7 +36,7 @@ abstract class Action
      */
     public function visit(RoleInterface $user)
     {
-        if (!$user instanceof UserInterface) {
+        if (!$user instanceof KickerUserInterface) {
             throw new LogicException('Object must implement UserInterface');
         }
         $result = new NullActionResponse();
@@ -48,6 +48,7 @@ abstract class Action
                 $result = $this->visitPlayer($user);
                 break;
         }
+
         return $result;
     }
 }
