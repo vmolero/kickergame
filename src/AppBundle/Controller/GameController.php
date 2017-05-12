@@ -6,16 +6,16 @@ use AppBundle\Domain\Action\ConfirmGameAction;
 use AppBundle\Domain\Action\DisplayGamesAction;
 use AppBundle\Domain\Action\DisplayGamesFormAction;
 use AppBundle\Entity\Game;
-use AppBundle\Entity\Team;
-use AppBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as CFG;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class GameController
  * @package AppBundle\Controller
  */
-class GameController extends KickerController
+class GameController extends Controller
 {
     const GAME_ROUTE_NAME = 'games';
     const SPECIFIC_PLAYER_GAME_ROUTE_NAME = 'specificPlayerGames';
@@ -25,7 +25,7 @@ class GameController extends KickerController
      * @CFG\Route("/games/new/", name="newGame")
      *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function showFormNewGameAction(Request $request)
     {
@@ -34,19 +34,28 @@ class GameController extends KickerController
         /** @var FormInterface $form */
 
         $handler->handle(
-            new DisplayGamesFormAction($request,
+            new DisplayGamesFormAction(
+                $request,
                 $this->getDoctrine()->getRepository(Game::REPOSITORY),
-                $this->get('app.game_form_provider')),
+                $this->get('app.game_form_provider')
+            ),
             $this->getParameter('template.newgame')
         );
 
-        return $this->buildResponse($handler);
+        /* @var $render RenderService */
+        $render = $this->get('app.render');
+
+        return $render->buildResponse($handler);
     }
 
     /**
      * @CFG\Security("has_role('ROLE_PLAYER')")
      * @CFG\Route("/games/", name="games")
      * @CFG\Route("/players/{id}/games/", name="specificPlayerGames")
+     *
+     * @param Request $request
+     * @param null $id
+     * @return Response
      */
     public function showGamesAction(Request $request, $id = null)
     {
@@ -57,12 +66,16 @@ class GameController extends KickerController
             $this->getParameter('template.games')
         );
 
-        return $this->buildResponse($handler);
+        /* @var $render RenderService */
+        $render = $this->get('app.render');
+
+        return $render->buildResponse($handler);
     }
 
     /**
      * @CFG\Security("has_role('ROLE_ADMIN') or has_role('ROLE_PLAYER')")
      * @CFG\Route("/games/{id}/score/confirm", name="confirmGame")
+     *
      * @param Request $request
      * @param integer $id
      * @return ResponseRedirect
@@ -75,7 +88,9 @@ class GameController extends KickerController
         $handler->handle(
             new ConfirmGameAction($request, $this->getDoctrine()->getRepository(Game::REPOSITORY), $id)
         );
-        $this->fillFlashBag($handler->getMessages());
+        /* @var $render RenderService */
+        $render = $this->get('app.render');
+        $render->fillFlashBag($handler->getMessages());
         if (is_numeric($referrer)) {
             return $this->redirectToRoute('specificPlayerGames', ['id' => $referrer]);
         }

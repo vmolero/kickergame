@@ -49,3 +49,6 @@ services:
     app.game_form_provider:
         class: AppBundle\ServiceLayer\GameFormProvider
         arguments: ['@form.factory', '@app.user_repository', '@app.team_repository']
+    app.render:
+        class: AppBundle\ServiceLayer\RenderService
+        arguments: ['@templating.engine.twig','@session']

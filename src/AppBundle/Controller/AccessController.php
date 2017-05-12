@@ -3,18 +3,24 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Domain\Action\DashboardAction;
-use AppBundle\RoleHandler\RoleHandler;
+use AppBundle\ServiceLayer\RenderService;
+use AppBundle\ServiceLayer\RoleHandler;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as CFG;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class AccessController
  * @package AppBundle\Controller
  */
-class AccessController extends KickerController
+class AccessController extends Controller
 {
     /**
      * @CFG\Route("/", name="home")
+     *
+     * @param Request $request
+     * @return RedirectResponse
      */
     public function indexAction(Request $request)
     {
@@ -27,13 +33,18 @@ class AccessController extends KickerController
     /**
      * @CFG\Security("has_role('ROLE_PLAYER')")
      * @CFG\Route("/dashboard/", name="dashboard")
+     *
+     * @param Request $request
+     * @return mixed
      */
     public function dashboardAction(Request $request)
     {
         /* @var $handler RoleHandler  */
         $handler = $this->get('app.role_handler');
         $handler->handle(new DashboardAction($request), $this->getParameter('template.dashboard'));
+        /* @var $render RenderService  */
+        $render = $this->get('app.render');
 
-        return $this->buildResponse($handler);
+        return $render->buildResponse($handler);
     }
 }
