@@ -4,16 +4,17 @@
     <div id="wrapper">
         <div id="container">
             <h2>Player list</h2>
-            <p><a href="{{ app.request.baseUrl ~ registerUrl }}">Add player</a></p>
+            <p><a href="{{ app.request.baseUrl ~ registerUrl }}">Add user</a></p>
             <table class="table">
                 <thead>
-                <th>Id</th><th>Username</th><th>Full Name</th><th>Email</th>
+                <th>Id</th><th>Role</th><th>Username</th><th>Full Name</th><th>Email</th>
                 </thead>
                 <tbody>
-                {% for player in players %}
-                    <tr><td>{{ player.id }} <a href="{{ app.request.baseUrl }}/players/{{ player.id }}/delete">Delete</a> | <a href="{{ app.request.baseUrl }}/players/{{ player.id }}/edit">Edit</a></td>
-                        <td>{{ player.username }}</td>
-                        <td>{{ player.fullName }}</td><td><a href="mailto:{{ player.email }}">{{ player.email }}</a></td>
+                {% for user in users %}
+                    <tr><td>{{ user.id }} <a href="{{ app.request.baseUrl }}/users/{{ user.id }}/delete">Delete</a> | <a href="{{ app.request.baseUrl }}/users/{{ user.id }}/edit">Edit</a></td>
+                        <td>{{ user.role }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.fullName }}</td><td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
                     </tr>
                 {% endfor %}
                 </tbody>

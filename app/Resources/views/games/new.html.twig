@@ -4,5 +4,5 @@
     {{ form_start(form) }}
     {{ form_widget(form) }}
     {{ form_end(form) }}
-    <p><a href="{{ baseUrl }}/games">See games</a> | <a href="{{ baseUrl }}/dashboard">Back to menu</a></p>
+    <p><a href="{{ app.request.baseUrl ~ gamesUrl }}">See games</a> | <a href="{{ app.request.baseUrl ~ dashboardUrl }}">Back to menu</a></p>
 {% endblock %}

@@ -2,9 +2,10 @@
 
 namespace AppBundle\Entity;
 
+use AppBundle\Domain\Interfaces\KickerUserInterface;
 use AppBundle\Entity\Interfaces\TeamHolder;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
+use FOS\UserBundle\Model\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass="AppBundle\Repository\TeamRepository")
@@ -21,26 +22,39 @@ class Team implements TeamHolder
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
+     * @var integer
      */
     protected $id;
 
     /**
      * @ORM\Column(name="name", nullable=true)
+     *
+     * @var string
      */
     protected $name;
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="id", cascade={"persist"})
      * @ORM\JoinColumn(name="player1", referencedColumnName="id")
+     *
+     * @var KickerUserInterface
      */
     protected $player1;
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="id", cascade={"persist"})
      * @ORM\JoinColumn(name="player2", referencedColumnName="id")
+     *
+     * @var KickerUserInterface
      */
     protected $player2;
 
-    public function __construct(UserInterface $player1 = null, UserInterface $player2 = null)
+    /**
+     * Team constructor.
+     * @param KickerUserInterface|null $player1
+     * @param KickerUserInterface|null $player2
+     */
+    public function __construct(KickerUserInterface $player1 = null, KickerUserInterface $player2 = null)
     {
         $this->player1 = $player1;
         $this->player2 = $player2;
@@ -66,18 +80,19 @@ class Team implements TeamHolder
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getName()
     {
         if (null === $this->name) {
             return $this->player1->getUsername().'+'.$this->player2->getUsername();
         }
+
         return $this->name;
     }
 
     /**
-     * @param mixed $name
+     * @param string $name
      * @return Team
      */
     public function setName($name)
@@ -88,7 +103,7 @@ class Team implements TeamHolder
     }
 
     /**
-     * @return mixed
+     * @return UserInterface
      */
     public function getPlayer1()
     {
@@ -96,10 +111,10 @@ class Team implements TeamHolder
     }
 
     /**
-     * @param mixed $player1
+     * @param KickerUserInterface $player1
      * @return Team
      */
-    public function setPlayer1(UserInterface $player1)
+    public function setPlayer1(KickerUserInterface $player1)
     {
         $this->player1 = $player1;
 
@@ -107,7 +122,7 @@ class Team implements TeamHolder
     }
 
     /**
-     * @return mixed
+     * @return UserInterface
      */
     public function getPlayer2()
     {
@@ -115,23 +130,31 @@ class Team implements TeamHolder
     }
 
     /**
-     * @param mixed $player2
+     * @param KickerUserInterface $player2
      * @return Team
      */
-    public function setPlayer2(UserInterface $player2)
+    public function setPlayer2(KickerUserInterface $player2)
     {
         $this->player2 = $player2;
 
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function hasConflicts()
     {
-        return $this->player1 === $this->player2;
+        return $this->player1->getEmail() === $this->player2->getEmail();
     }
 
-    public function hasPlayer(UserInterface $player)
+    /**
+     * @param KickerUserInterface $player
+     * @return bool
+     */
+    public function hasPlayer(KickerUserInterface $player)
     {
-        return $player === $this->player1 || $player === $this->player2;
+        return $player->getEmail() === $this->player1->getEmail() ||
+            $player->getEmail() === $this->player2->getEmail();
     }
 }

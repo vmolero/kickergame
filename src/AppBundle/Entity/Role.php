@@ -4,12 +4,13 @@ namespace AppBundle\Entity;
 
 use AppBundle\Entity\Interfaces\RoleHolder;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\Role\RoleInterface;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="role")
  */
-class Role implements RoleHolder
+class Role implements RoleInterface
 {
     const ADMIN = 'ROLE_ADMIN';
     const PLAYER = 'ROLE_PLAYER';
@@ -23,7 +24,7 @@ class Role implements RoleHolder
     /**
      * @ORM\Column(type="string", unique=true)
      */
-    protected $type;
+    protected $role;
     /**
      * @ORM\Column(type="string")
      */
@@ -36,11 +37,11 @@ class Role implements RoleHolder
         {
             case self::ADMIN:
             case 'admin':
-                $c->setType(self::ADMIN);
+                $c->setRole(self::ADMIN);
                 break;
             case self::PLAYER:
             case 'player':
-                $c->setType(self::PLAYER);
+                $c->setRole(self::PLAYER);
                 break;
         }
 
@@ -69,17 +70,17 @@ class Role implements RoleHolder
     /**
      * @return mixed
      */
-    public function getType()
+    public function getRole()
     {
-        return $this->type;
+        return $this->role;
     }
 
     /**
-     * @param mixed $type
+     * @param mixed $role
      */
-    public function setType($type)
+    public function setRole($role)
     {
-        $this->type = $type;
+        $this->role = $role;
     }
 
     /**

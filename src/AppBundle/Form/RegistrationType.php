@@ -7,6 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use AppBundle\Entity\Role;
+use Symfony\Component\Security\Core\Role\RoleInterface;
 
 class RegistrationType extends AbstractType
 {
@@ -22,17 +23,17 @@ class RegistrationType extends AbstractType
                     Role::create('player'),
                 ],
                 'choices_as_values' => true,
-                'choice_label' => function (RoleHolder $role, $key, $index) {
-                    return $role->getType() === Role::ADMIN ? 'Administrator' : 'Player';
+                'choice_label' => function (RoleInterface $role, $key, $index) {
+                    return $role->getRole() === Role::ADMIN ? 'Administrator' : 'Player';
                 },
                 'choice_value' => function ($value) {
-                    if ($value instanceof RoleHolder) {
-                        return $value->getType();
+                    if ($value instanceof RoleInterface) {
+                        return $value->getRole();
                     }
 
                     return null;
                 },
-                'choice_attr' => function (RoleHolder $role, $key, $index) {
+                'choice_attr' => function (RoleInterface $role, $key, $index) {
                     return ['class' => 'role_holder'];
                 },
                 'required' => true,

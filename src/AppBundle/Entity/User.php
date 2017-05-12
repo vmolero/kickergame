@@ -2,9 +2,11 @@
 
 namespace AppBundle\Entity;
 
+use AppBundle\Domain\Interfaces\KickerUserInterface;
 use AppBundle\Entity\Interfaces\RoleHolder;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Entity\User as BaseUser;
+use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
@@ -12,7 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
  * @ORM\Table(name="user")
  */
-class User extends BaseUser
+class User extends BaseUser implements KickerUserInterface, RoleInterface
 {
     const REPOSITORY = 'AppBundle:User';
     /**
@@ -117,4 +119,16 @@ class User extends BaseUser
 
         return array_unique($roles);
     }
+
+    public function getEntity()
+    {
+        return $this;
+    }
+
+    public function getRole()
+    {
+        return $this->hasRole(Role::ADMIN) ? Role::ADMIN : Role::PLAYER;
+    }
+
+
 }

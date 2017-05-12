@@ -1,24 +1,25 @@
 # Learn more about services, parameters and containers at
 # http://symfony.com/doc/current/service_container.html
 parameters:
-    template:
-        dashboard:
+    template.dashboard:
             admin: admin/index.html.twig
             player: players/index.html.twig
-        players:
-            admin: admin/index.html.twig
-            player: players/index.html.twig
-        games:
+    template.players:
+            admin: admin/players.html.twig
+            player: players/players.html.twig
+    template.games:
             admin: games/admin.html.twig
             player: games/players.html.twig
-        newGame: games/new.html.twig
-        newPlayer: UserBundle:Registration:register.html.twig    
+    template.newgame:
+            admin: games/new.html.twig
+            player: games/new.html.twig
+    template.newplayer: UserBundle:Registration:register.html.twig
             
 
 services:
     #service_name:
     #    class: AppBundle\Directory\ClassName
-    #    arguments: ['@another_service_name', 'plain_value', '%parameter_name%'] , '@templating', '@session'
+    #    arguments: ['@another_service_name', 'plain_value', '%parameter_name%']
     app.form.registration:
         class: AppBundle\Form\RegistrationType
         tags:
@@ -32,9 +33,22 @@ services:
         arguments: ["@fos_user.registration.form", "@request", "@fos_user.user_manager", "@fos_user.mailer", "@fos_user.util.token_generator"]
         scope: request
         public: false
-    app.role_handler_factory:
-        class: AppBundle\RoleHandler\RoleHandlerFactory
     app.role_handler:
-        class: AppBundle\RoleHandler\RoleHandler
-        factory: 'app.role_handler_factory:create'
-        arguments: ['@security.authorization_checker']
+        class: AppBundle\ServiceLayer\RoleHandler
+        arguments: ['@security.authorization_checker', '@security.token_storage']
+    app.user_repository:
+            class: Doctrine\ORM\EntityRepository
+            factory: ["@doctrine.orm.entity_manager", getRepository]
+            arguments:
+                - AppBundle\Entity\User
+    app.team_repository:
+                class: Doctrine\ORM\EntityRepository
+                factory: ["@doctrine.orm.entity_manager", getRepository]
+                arguments:
+                    - AppBundle\Entity\Team
+    app.game_form_provider:
+        class: AppBundle\ServiceLayer\GameFormProvider
+        arguments: ['@form.factory', '@app.user_repository', '@app.team_repository']
+    app.render:
+        class: AppBundle\ServiceLayer\RenderService
+        arguments: ['@templating.engine.twig','@session']

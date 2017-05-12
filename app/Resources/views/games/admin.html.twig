@@ -14,8 +14,8 @@
                     <tr>
                         <td>{{ game.id }}
                             {% if (game.confirmedBy is null) %}
-                                <a href="{{ app.request.baseUrl }}/game/{{ game.id }}/score/edit">Edit score</a> |
-                                <a href="{{ app.request.baseUrl }}/game/{{ game.id }}/score/confirm?from={{ referrer|url_encode }}">Confirm score</a>
+                                <a href="{{ app.request.baseUrl }}/games/{{ game.id }}/score/edit">Edit score</a> |
+                                <a href="{{ app.request.baseUrl }}/games/{{ game.id }}/score/confirm?from={{ referrer|url_encode }}">Confirm score</a>
                             {% endif %}
                         </td>
                         <td>{{ game.local.name }}</td>
