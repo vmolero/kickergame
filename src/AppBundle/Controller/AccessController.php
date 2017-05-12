@@ -41,10 +41,10 @@ class AccessController extends Controller
     {
         /* @var $handler RoleHandler  */
         $handler = $this->get('app.role_handler');
-        $handler->handle(new DashboardAction($request), $this->getParameter('template.dashboard'));
+        $handler->handle(new DashboardAction($request));
         /* @var $render RenderService  */
         $render = $this->get('app.render');
 
-        return $render->buildResponse($handler);
+        return $render->setTemplate($this->getParameter('template.dashboard'))->buildResponse($handler);
     }
 }

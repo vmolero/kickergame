@@ -3,6 +3,7 @@
 namespace AppBundle\ServiceLayer;
 
 
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -22,6 +23,10 @@ class RenderService
      * @var SessionInterface
      */
     private $session;
+    /**
+     * @var string|array
+     */
+    private $template;
 
     /**
      * RenderService constructor.
@@ -35,6 +40,17 @@ class RenderService
     }
 
     /**
+     * @param string|array $template
+     * @return RenderService
+     */
+    public function setTemplate($template)
+    {
+        $this->template = $template;
+
+        return $this;
+    }
+
+    /**
      * @param RoleHandler $handler
      * @return Response
      */
@@ -43,7 +59,7 @@ class RenderService
         $this->fillFlashBag($handler->getMessages());
 
         return $this->render(
-            $handler->getTemplate(),
+            $this->getTemplate($handler),
             $handler->getParameters()
         );
     }
@@ -51,7 +67,7 @@ class RenderService
     /**
      * @param array $messages
      */
-    protected function fillFlashBag(array $messages)
+    public function fillFlashBag(array $messages)
     {
         /** @var FlashBagInterface $flashBag */
         $flashBag = $this->session->getFlashBag();
@@ -61,12 +77,12 @@ class RenderService
     }
 
     /**
-     * @param $view
+     * @param string $template
      * @param array $parameters
      * @param Response|null $response
      * @return Response
      */
-    public function render($view, array $parameters = array(), Response $response = null)
+    private function render($template, array $parameters = array(), Response $response = null)
     {
         if (!$this->renderEngine) {
             throw new \LogicException(
@@ -76,6 +92,23 @@ class RenderService
         if ($response === null) {
             $response = new Response();
         }
-        return $response->setContent($this->renderEngine->render($view, $parameters));
+
+        return $response->setContent($this->renderEngine->render($template, $parameters));
+    }
+
+    /**
+     * @param RoleHandler $handler
+     * @return array|mixed|string
+     */
+    private function getTemplate(RoleHandler $handler)
+    {
+        if (is_string($this->template)) {
+            return $this->template;
+        }
+        $roleParameter = $handler->getRoleTemplateParameter();
+        if (isset($this->template[$roleParameter])) {
+            return $this->template[$roleParameter];
+        }
+        throw new LogicException('You must provide a template for the role');
     }
 }

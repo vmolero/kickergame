@@ -6,6 +6,7 @@ use AppBundle\Domain\Action\ConfirmGameAction;
 use AppBundle\Domain\Action\DisplayGamesAction;
 use AppBundle\Domain\Action\DisplayGamesFormAction;
 use AppBundle\Entity\Game;
+use AppBundle\ServiceLayer\RenderService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as CFG;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,9 +18,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class GameController extends Controller
 {
-    const GAME_ROUTE_NAME = 'games';
-    const SPECIFIC_PLAYER_GAME_ROUTE_NAME = 'specificPlayerGames';
-
     /**
      * @CFG\Security("has_role('ROLE_ADMIN') or has_role('ROLE_PLAYER')")
      * @CFG\Route("/games/new/", name="newGame")
@@ -29,23 +27,21 @@ class GameController extends Controller
      */
     public function showFormNewGameAction(Request $request)
     {
-        /* @var $handler RoleHandler */
+        /** @var $handler RoleHandler */
         $handler = $this->get('app.role_handler');
-        /** @var FormInterface $form */
-
         $handler->handle(
             new DisplayGamesFormAction(
                 $request,
                 $this->getDoctrine()->getRepository(Game::REPOSITORY),
                 $this->get('app.game_form_provider')
-            ),
-            $this->getParameter('template.newgame')
+            )
         );
 
-        /* @var $render RenderService */
+        /** @var $render RenderService */
         $render = $this->get('app.render');
 
-        return $render->buildResponse($handler);
+        return $render->setTemplate($this->getParameter('template.newgame'))
+            ->buildResponse($handler);
     }
 
     /**
@@ -62,14 +58,18 @@ class GameController extends Controller
         /** @var $handler RoleHandler */
         $handler = $this->get('app.role_handler');
         $handler->handle(
-            new DisplayGamesAction($request, $this->getDoctrine()->getRepository(Game::REPOSITORY), $id),
-            $this->getParameter('template.games')
+            new DisplayGamesAction(
+                $request,
+                $this->getDoctrine()->getRepository(Game::REPOSITORY),
+                $id
+            )
         );
 
         /* @var $render RenderService */
         $render = $this->get('app.render');
 
-        return $render->buildResponse($handler);
+        return $render->setTemplate($this->getParameter('template.games'))
+            ->buildResponse($handler);
     }
 
     /**

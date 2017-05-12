@@ -27,13 +27,12 @@ class UserController extends Controller
             new DisplayUsersAction(
                 $request, $this->getDoctrine()
                 ->getRepository(User::REPOSITORY)
-            ),
-            $this->getParameter('template.players')
+            )
         );
 
         /* @var $render RenderService  */
         $render = $this->get('app.render');
 
-        return $render->buildResponse($handler);
+        return $render->setTemplate($this->getParameter('template.players'))->buildResponse($handler);
     }
 }
